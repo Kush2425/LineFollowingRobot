@@ -1,0 +1,2297 @@
+type st = St_WhitelineFollower|St_Whiteline|St_Stopstate|St_Parkright|
+  St_Parkleft|St_ParkingState|St_ObstacleRight|St_ObstacleLeft|
+  St_ObstacleForward|St_ObstacleFinalRight|St_LineSwitch|St_Blackline|
+  St_BlackUturn|St_BlackRight
+node line_follower(sen : int^5; irsenLeft : bool; irsenFront : bool;
+                    irsenRight : bool)
+returns (v_l : int; v_r : int; direction : int)
+var lastcountwhite : int; whiteavgsen4 : int; whiteavgsen3 : int;
+    whiteavgsen2 : int; whiteavgsen1 : int; whiteavgsen0 : int;
+    finalavg4 : int; finalavg3 : int; finalavg2 : int; finalavg1 : int;
+    finalavg0 : int; rightCounter : int; navigation : int;
+    checkparkhere : int; parkingelapse : int; parkdir : int;
+    parkrighttimer : int; parklefttimer : int; stopCounter : int;
+    objectLeftCounter : int; objectCounter : int; right : int; left : int;
+    sum : int; act4 : int; act3 : int; act2 : int; act1 : int; act0 : int;
+    dir : int; number : int; pid_value : int; d : int; i : int; p : int;
+    error : int; uTurn : bool; rightTurn : bool; rightTurn_1 : bool;
+    uTurn_1 : bool; error_1 : int; p_1 : int; i_1 : int; d_1 : int;
+    pid_value_1 : int; number_1 : int; dir_1 : int; act0_1 : int;
+    act1_1 : int; act2_1 : int; act3_1 : int; act4_1 : int; sum_1 : int;
+    left_1 : int; right_1 : int; objectCounter_1 : int;
+    objectLeftCounter_1 : int; stopCounter_1 : int; parklefttimer_1 : int;
+    parkrighttimer_1 : int; parkdir_1 : int; parkingelapse_1 : int;
+    checkparkhere_1 : int; navigation_1 : int; rightCounter_1 : int;
+    finalavg0_1 : int; finalavg1_1 : int; finalavg2_1 : int;
+    finalavg3_1 : int; finalavg4_1 : int; whiteavgsen0_1 : int;
+    whiteavgsen1_1 : int; whiteavgsen2_1 : int; whiteavgsen3_1 : int;
+    whiteavgsen4_1 : int; lastcountwhite_1 : int; pnr : bool; nr : bool;
+    r : bool; ns : st; ck : st; v_l_St_WhitelineFollower : int;
+    v_r_St_WhitelineFollower : int; direction_St_WhitelineFollower : int;
+    rightTurn_St_WhitelineFollower : bool; uTurn_St_WhitelineFollower : bool;
+    error_St_WhitelineFollower : int; p_St_WhitelineFollower : int;
+    i_St_WhitelineFollower : int; d_St_WhitelineFollower : int;
+    pid_value_St_WhitelineFollower : int; number_St_WhitelineFollower : int;
+    dir_St_WhitelineFollower : int; act0_St_WhitelineFollower : int;
+    act1_St_WhitelineFollower : int; act2_St_WhitelineFollower : int;
+    act3_St_WhitelineFollower : int; act4_St_WhitelineFollower : int;
+    sum_St_WhitelineFollower : int; left_St_WhitelineFollower : int;
+    right_St_WhitelineFollower : int;
+    objectCounter_St_WhitelineFollower : int;
+    objectLeftCounter_St_WhitelineFollower : int;
+    stopCounter_St_WhitelineFollower : int;
+    parklefttimer_St_WhitelineFollower : int;
+    parkrighttimer_St_WhitelineFollower : int;
+    parkdir_St_WhitelineFollower : int;
+    parkingelapse_St_WhitelineFollower : int;
+    checkparkhere_St_WhitelineFollower : int;
+    navigation_St_WhitelineFollower : int;
+    rightCounter_St_WhitelineFollower : int;
+    finalavg0_St_WhitelineFollower : int;
+    finalavg1_St_WhitelineFollower : int;
+    finalavg2_St_WhitelineFollower : int;
+    finalavg3_St_WhitelineFollower : int;
+    finalavg4_St_WhitelineFollower : int;
+    whiteavgsen0_St_WhitelineFollower : int;
+    whiteavgsen1_St_WhitelineFollower : int;
+    whiteavgsen2_St_WhitelineFollower : int;
+    whiteavgsen3_St_WhitelineFollower : int;
+    whiteavgsen4_St_WhitelineFollower : int;
+    lastcountwhite_St_WhitelineFollower : int; ns_St_WhitelineFollower : st;
+    nr_St_WhitelineFollower : bool; v_l_St_Whiteline : int;
+    v_r_St_Whiteline : int; direction_St_Whiteline : int;
+    rightTurn_St_Whiteline : bool; uTurn_St_Whiteline : bool;
+    error_St_Whiteline : int; p_St_Whiteline : int; i_St_Whiteline : int;
+    d_St_Whiteline : int; pid_value_St_Whiteline : int;
+    number_St_Whiteline : int; dir_St_Whiteline : int;
+    act0_St_Whiteline : int; act1_St_Whiteline : int;
+    act2_St_Whiteline : int; act3_St_Whiteline : int;
+    act4_St_Whiteline : int; sum_St_Whiteline : int; left_St_Whiteline : int;
+    right_St_Whiteline : int; objectCounter_St_Whiteline : int;
+    objectLeftCounter_St_Whiteline : int; stopCounter_St_Whiteline : int;
+    parklefttimer_St_Whiteline : int; parkrighttimer_St_Whiteline : int;
+    parkdir_St_Whiteline : int; parkingelapse_St_Whiteline : int;
+    checkparkhere_St_Whiteline : int; navigation_St_Whiteline : int;
+    rightCounter_St_Whiteline : int; finalavg0_St_Whiteline : int;
+    finalavg1_St_Whiteline : int; finalavg2_St_Whiteline : int;
+    finalavg3_St_Whiteline : int; finalavg4_St_Whiteline : int;
+    whiteavgsen0_St_Whiteline : int; whiteavgsen1_St_Whiteline : int;
+    whiteavgsen2_St_Whiteline : int; whiteavgsen3_St_Whiteline : int;
+    whiteavgsen4_St_Whiteline : int; lastcountwhite_St_Whiteline : int;
+    ns_St_Whiteline : st; nr_St_Whiteline : bool; v_l_St_LineSwitch : int;
+    v_r_St_LineSwitch : int; direction_St_LineSwitch : int;
+    rightTurn_St_LineSwitch : bool; uTurn_St_LineSwitch : bool;
+    error_St_LineSwitch : int; p_St_LineSwitch : int; i_St_LineSwitch : int;
+    d_St_LineSwitch : int; pid_value_St_LineSwitch : int;
+    number_St_LineSwitch : int; dir_St_LineSwitch : int;
+    act0_St_LineSwitch : int; act1_St_LineSwitch : int;
+    act2_St_LineSwitch : int; act3_St_LineSwitch : int;
+    act4_St_LineSwitch : int; sum_St_LineSwitch : int;
+    left_St_LineSwitch : int; right_St_LineSwitch : int;
+    objectCounter_St_LineSwitch : int; objectLeftCounter_St_LineSwitch : int;
+    stopCounter_St_LineSwitch : int; parklefttimer_St_LineSwitch : int;
+    parkrighttimer_St_LineSwitch : int; parkdir_St_LineSwitch : int;
+    parkingelapse_St_LineSwitch : int; checkparkhere_St_LineSwitch : int;
+    navigation_St_LineSwitch : int; rightCounter_St_LineSwitch : int;
+    finalavg0_St_LineSwitch : int; finalavg1_St_LineSwitch : int;
+    finalavg2_St_LineSwitch : int; finalavg3_St_LineSwitch : int;
+    finalavg4_St_LineSwitch : int; whiteavgsen0_St_LineSwitch : int;
+    whiteavgsen1_St_LineSwitch : int; whiteavgsen2_St_LineSwitch : int;
+    whiteavgsen3_St_LineSwitch : int; whiteavgsen4_St_LineSwitch : int;
+    lastcountwhite_St_LineSwitch : int; ns_St_LineSwitch : st;
+    nr_St_LineSwitch : bool; v_l_St_ObstacleRight : int;
+    v_r_St_ObstacleRight : int; direction_St_ObstacleRight : int;
+    rightTurn_St_ObstacleRight : bool; uTurn_St_ObstacleRight : bool;
+    error_St_ObstacleRight : int; p_St_ObstacleRight : int;
+    i_St_ObstacleRight : int; d_St_ObstacleRight : int;
+    pid_value_St_ObstacleRight : int; number_St_ObstacleRight : int;
+    dir_St_ObstacleRight : int; act0_St_ObstacleRight : int;
+    act1_St_ObstacleRight : int; act2_St_ObstacleRight : int;
+    act3_St_ObstacleRight : int; act4_St_ObstacleRight : int;
+    sum_St_ObstacleRight : int; left_St_ObstacleRight : int;
+    right_St_ObstacleRight : int; objectCounter_St_ObstacleRight : int;
+    objectLeftCounter_St_ObstacleRight : int;
+    stopCounter_St_ObstacleRight : int; parklefttimer_St_ObstacleRight : int;
+    parkrighttimer_St_ObstacleRight : int; parkdir_St_ObstacleRight : int;
+    parkingelapse_St_ObstacleRight : int;
+    checkparkhere_St_ObstacleRight : int; navigation_St_ObstacleRight : int;
+    rightCounter_St_ObstacleRight : int; finalavg0_St_ObstacleRight : int;
+    finalavg1_St_ObstacleRight : int; finalavg2_St_ObstacleRight : int;
+    finalavg3_St_ObstacleRight : int; finalavg4_St_ObstacleRight : int;
+    whiteavgsen0_St_ObstacleRight : int; whiteavgsen1_St_ObstacleRight : int;
+    whiteavgsen2_St_ObstacleRight : int; whiteavgsen3_St_ObstacleRight : int;
+    whiteavgsen4_St_ObstacleRight : int;
+    lastcountwhite_St_ObstacleRight : int; ns_St_ObstacleRight : st;
+    nr_St_ObstacleRight : bool; v_l_St_ObstacleForward : int;
+    v_r_St_ObstacleForward : int; direction_St_ObstacleForward : int;
+    rightTurn_St_ObstacleForward : bool; uTurn_St_ObstacleForward : bool;
+    error_St_ObstacleForward : int; p_St_ObstacleForward : int;
+    i_St_ObstacleForward : int; d_St_ObstacleForward : int;
+    pid_value_St_ObstacleForward : int; number_St_ObstacleForward : int;
+    dir_St_ObstacleForward : int; act0_St_ObstacleForward : int;
+    act1_St_ObstacleForward : int; act2_St_ObstacleForward : int;
+    act3_St_ObstacleForward : int; act4_St_ObstacleForward : int;
+    sum_St_ObstacleForward : int; left_St_ObstacleForward : int;
+    right_St_ObstacleForward : int; objectCounter_St_ObstacleForward : int;
+    objectLeftCounter_St_ObstacleForward : int;
+    stopCounter_St_ObstacleForward : int;
+    parklefttimer_St_ObstacleForward : int;
+    parkrighttimer_St_ObstacleForward : int;
+    parkdir_St_ObstacleForward : int; parkingelapse_St_ObstacleForward : int;
+    checkparkhere_St_ObstacleForward : int;
+    navigation_St_ObstacleForward : int;
+    rightCounter_St_ObstacleForward : int;
+    finalavg0_St_ObstacleForward : int; finalavg1_St_ObstacleForward : int;
+    finalavg2_St_ObstacleForward : int; finalavg3_St_ObstacleForward : int;
+    finalavg4_St_ObstacleForward : int;
+    whiteavgsen0_St_ObstacleForward : int;
+    whiteavgsen1_St_ObstacleForward : int;
+    whiteavgsen2_St_ObstacleForward : int;
+    whiteavgsen3_St_ObstacleForward : int;
+    whiteavgsen4_St_ObstacleForward : int;
+    lastcountwhite_St_ObstacleForward : int; ns_St_ObstacleForward : st;
+    nr_St_ObstacleForward : bool; v_l_St_ObstacleLeft : int;
+    v_r_St_ObstacleLeft : int; direction_St_ObstacleLeft : int;
+    rightTurn_St_ObstacleLeft : bool; uTurn_St_ObstacleLeft : bool;
+    error_St_ObstacleLeft : int; p_St_ObstacleLeft : int;
+    i_St_ObstacleLeft : int; d_St_ObstacleLeft : int;
+    pid_value_St_ObstacleLeft : int; number_St_ObstacleLeft : int;
+    dir_St_ObstacleLeft : int; act0_St_ObstacleLeft : int;
+    act1_St_ObstacleLeft : int; act2_St_ObstacleLeft : int;
+    act3_St_ObstacleLeft : int; act4_St_ObstacleLeft : int;
+    sum_St_ObstacleLeft : int; left_St_ObstacleLeft : int;
+    right_St_ObstacleLeft : int; objectCounter_St_ObstacleLeft : int;
+    objectLeftCounter_St_ObstacleLeft : int;
+    stopCounter_St_ObstacleLeft : int; parklefttimer_St_ObstacleLeft : int;
+    parkrighttimer_St_ObstacleLeft : int; parkdir_St_ObstacleLeft : int;
+    parkingelapse_St_ObstacleLeft : int; checkparkhere_St_ObstacleLeft : int;
+    navigation_St_ObstacleLeft : int; rightCounter_St_ObstacleLeft : int;
+    finalavg0_St_ObstacleLeft : int; finalavg1_St_ObstacleLeft : int;
+    finalavg2_St_ObstacleLeft : int; finalavg3_St_ObstacleLeft : int;
+    finalavg4_St_ObstacleLeft : int; whiteavgsen0_St_ObstacleLeft : int;
+    whiteavgsen1_St_ObstacleLeft : int; whiteavgsen2_St_ObstacleLeft : int;
+    whiteavgsen3_St_ObstacleLeft : int; whiteavgsen4_St_ObstacleLeft : int;
+    lastcountwhite_St_ObstacleLeft : int; ns_St_ObstacleLeft : st;
+    nr_St_ObstacleLeft : bool; v_l_St_ObstacleFinalRight : int;
+    v_r_St_ObstacleFinalRight : int; direction_St_ObstacleFinalRight : int;
+    rightTurn_St_ObstacleFinalRight : bool;
+    uTurn_St_ObstacleFinalRight : bool; error_St_ObstacleFinalRight : int;
+    p_St_ObstacleFinalRight : int; i_St_ObstacleFinalRight : int;
+    d_St_ObstacleFinalRight : int; pid_value_St_ObstacleFinalRight : int;
+    number_St_ObstacleFinalRight : int; dir_St_ObstacleFinalRight : int;
+    act0_St_ObstacleFinalRight : int; act1_St_ObstacleFinalRight : int;
+    act2_St_ObstacleFinalRight : int; act3_St_ObstacleFinalRight : int;
+    act4_St_ObstacleFinalRight : int; sum_St_ObstacleFinalRight : int;
+    left_St_ObstacleFinalRight : int; right_St_ObstacleFinalRight : int;
+    objectCounter_St_ObstacleFinalRight : int;
+    objectLeftCounter_St_ObstacleFinalRight : int;
+    stopCounter_St_ObstacleFinalRight : int;
+    parklefttimer_St_ObstacleFinalRight : int;
+    parkrighttimer_St_ObstacleFinalRight : int;
+    parkdir_St_ObstacleFinalRight : int;
+    parkingelapse_St_ObstacleFinalRight : int;
+    checkparkhere_St_ObstacleFinalRight : int;
+    navigation_St_ObstacleFinalRight : int;
+    rightCounter_St_ObstacleFinalRight : int;
+    finalavg0_St_ObstacleFinalRight : int;
+    finalavg1_St_ObstacleFinalRight : int;
+    finalavg2_St_ObstacleFinalRight : int;
+    finalavg3_St_ObstacleFinalRight : int;
+    finalavg4_St_ObstacleFinalRight : int;
+    whiteavgsen0_St_ObstacleFinalRight : int;
+    whiteavgsen1_St_ObstacleFinalRight : int;
+    whiteavgsen2_St_ObstacleFinalRight : int;
+    whiteavgsen3_St_ObstacleFinalRight : int;
+    whiteavgsen4_St_ObstacleFinalRight : int;
+    lastcountwhite_St_ObstacleFinalRight : int;
+    ns_St_ObstacleFinalRight : st; nr_St_ObstacleFinalRight : bool;
+    v_l_St_Blackline : int; v_r_St_Blackline : int;
+    direction_St_Blackline : int; rightTurn_St_Blackline : bool;
+    uTurn_St_Blackline : bool; error_St_Blackline : int;
+    p_St_Blackline : int; i_St_Blackline : int; d_St_Blackline : int;
+    pid_value_St_Blackline : int; number_St_Blackline : int;
+    dir_St_Blackline : int; act0_St_Blackline : int; act1_St_Blackline : int;
+    act2_St_Blackline : int; act3_St_Blackline : int;
+    act4_St_Blackline : int; sum_St_Blackline : int; left_St_Blackline : int;
+    right_St_Blackline : int; objectCounter_St_Blackline : int;
+    objectLeftCounter_St_Blackline : int; stopCounter_St_Blackline : int;
+    parklefttimer_St_Blackline : int; parkrighttimer_St_Blackline : int;
+    parkdir_St_Blackline : int; parkingelapse_St_Blackline : int;
+    checkparkhere_St_Blackline : int; navigation_St_Blackline : int;
+    rightCounter_St_Blackline : int; finalavg0_St_Blackline : int;
+    finalavg1_St_Blackline : int; finalavg2_St_Blackline : int;
+    finalavg3_St_Blackline : int; finalavg4_St_Blackline : int;
+    whiteavgsen0_St_Blackline : int; whiteavgsen1_St_Blackline : int;
+    whiteavgsen2_St_Blackline : int; whiteavgsen3_St_Blackline : int;
+    whiteavgsen4_St_Blackline : int; lastcountwhite_St_Blackline : int;
+    ns_St_Blackline : st; nr_St_Blackline : bool; v_l_St_BlackRight : int;
+    v_r_St_BlackRight : int; direction_St_BlackRight : int;
+    rightTurn_St_BlackRight : bool; uTurn_St_BlackRight : bool;
+    error_St_BlackRight : int; p_St_BlackRight : int; i_St_BlackRight : int;
+    d_St_BlackRight : int; pid_value_St_BlackRight : int;
+    number_St_BlackRight : int; dir_St_BlackRight : int;
+    act0_St_BlackRight : int; act1_St_BlackRight : int;
+    act2_St_BlackRight : int; act3_St_BlackRight : int;
+    act4_St_BlackRight : int; sum_St_BlackRight : int;
+    left_St_BlackRight : int; right_St_BlackRight : int;
+    objectCounter_St_BlackRight : int; objectLeftCounter_St_BlackRight : int;
+    stopCounter_St_BlackRight : int; parklefttimer_St_BlackRight : int;
+    parkrighttimer_St_BlackRight : int; parkdir_St_BlackRight : int;
+    parkingelapse_St_BlackRight : int; checkparkhere_St_BlackRight : int;
+    navigation_St_BlackRight : int; rightCounter_St_BlackRight : int;
+    finalavg0_St_BlackRight : int; finalavg1_St_BlackRight : int;
+    finalavg2_St_BlackRight : int; finalavg3_St_BlackRight : int;
+    finalavg4_St_BlackRight : int; whiteavgsen0_St_BlackRight : int;
+    whiteavgsen1_St_BlackRight : int; whiteavgsen2_St_BlackRight : int;
+    whiteavgsen3_St_BlackRight : int; whiteavgsen4_St_BlackRight : int;
+    lastcountwhite_St_BlackRight : int; ns_St_BlackRight : st;
+    nr_St_BlackRight : bool; v_l_St_BlackUturn : int;
+    v_r_St_BlackUturn : int; direction_St_BlackUturn : int;
+    rightTurn_St_BlackUturn : bool; uTurn_St_BlackUturn : bool;
+    error_St_BlackUturn : int; p_St_BlackUturn : int; i_St_BlackUturn : int;
+    d_St_BlackUturn : int; pid_value_St_BlackUturn : int;
+    number_St_BlackUturn : int; dir_St_BlackUturn : int;
+    act0_St_BlackUturn : int; act1_St_BlackUturn : int;
+    act2_St_BlackUturn : int; act3_St_BlackUturn : int;
+    act4_St_BlackUturn : int; sum_St_BlackUturn : int;
+    left_St_BlackUturn : int; right_St_BlackUturn : int;
+    objectCounter_St_BlackUturn : int; objectLeftCounter_St_BlackUturn : int;
+    stopCounter_St_BlackUturn : int; parklefttimer_St_BlackUturn : int;
+    parkrighttimer_St_BlackUturn : int; parkdir_St_BlackUturn : int;
+    parkingelapse_St_BlackUturn : int; checkparkhere_St_BlackUturn : int;
+    navigation_St_BlackUturn : int; rightCounter_St_BlackUturn : int;
+    finalavg0_St_BlackUturn : int; finalavg1_St_BlackUturn : int;
+    finalavg2_St_BlackUturn : int; finalavg3_St_BlackUturn : int;
+    finalavg4_St_BlackUturn : int; whiteavgsen0_St_BlackUturn : int;
+    whiteavgsen1_St_BlackUturn : int; whiteavgsen2_St_BlackUturn : int;
+    whiteavgsen3_St_BlackUturn : int; whiteavgsen4_St_BlackUturn : int;
+    lastcountwhite_St_BlackUturn : int; ns_St_BlackUturn : st;
+    nr_St_BlackUturn : bool; v_l_St_ParkingState : int;
+    v_r_St_ParkingState : int; direction_St_ParkingState : int;
+    rightTurn_St_ParkingState : bool; uTurn_St_ParkingState : bool;
+    error_St_ParkingState : int; p_St_ParkingState : int;
+    i_St_ParkingState : int; d_St_ParkingState : int;
+    pid_value_St_ParkingState : int; number_St_ParkingState : int;
+    dir_St_ParkingState : int; act0_St_ParkingState : int;
+    act1_St_ParkingState : int; act2_St_ParkingState : int;
+    act3_St_ParkingState : int; act4_St_ParkingState : int;
+    sum_St_ParkingState : int; left_St_ParkingState : int;
+    right_St_ParkingState : int; objectCounter_St_ParkingState : int;
+    objectLeftCounter_St_ParkingState : int;
+    stopCounter_St_ParkingState : int; parklefttimer_St_ParkingState : int;
+    parkrighttimer_St_ParkingState : int; parkdir_St_ParkingState : int;
+    parkingelapse_St_ParkingState : int; checkparkhere_St_ParkingState : int;
+    navigation_St_ParkingState : int; rightCounter_St_ParkingState : int;
+    finalavg0_St_ParkingState : int; finalavg1_St_ParkingState : int;
+    finalavg2_St_ParkingState : int; finalavg3_St_ParkingState : int;
+    finalavg4_St_ParkingState : int; whiteavgsen0_St_ParkingState : int;
+    whiteavgsen1_St_ParkingState : int; whiteavgsen2_St_ParkingState : int;
+    whiteavgsen3_St_ParkingState : int; whiteavgsen4_St_ParkingState : int;
+    lastcountwhite_St_ParkingState : int; ns_St_ParkingState : st;
+    nr_St_ParkingState : bool; v_l_St_Parkleft : int; v_r_St_Parkleft : int;
+    direction_St_Parkleft : int; rightTurn_St_Parkleft : bool;
+    uTurn_St_Parkleft : bool; error_St_Parkleft : int; p_St_Parkleft : int;
+    i_St_Parkleft : int; d_St_Parkleft : int; pid_value_St_Parkleft : int;
+    number_St_Parkleft : int; dir_St_Parkleft : int; act0_St_Parkleft : int;
+    act1_St_Parkleft : int; act2_St_Parkleft : int; act3_St_Parkleft : int;
+    act4_St_Parkleft : int; sum_St_Parkleft : int; left_St_Parkleft : int;
+    right_St_Parkleft : int; objectCounter_St_Parkleft : int;
+    objectLeftCounter_St_Parkleft : int; stopCounter_St_Parkleft : int;
+    parklefttimer_St_Parkleft : int; parkrighttimer_St_Parkleft : int;
+    parkdir_St_Parkleft : int; parkingelapse_St_Parkleft : int;
+    checkparkhere_St_Parkleft : int; navigation_St_Parkleft : int;
+    rightCounter_St_Parkleft : int; finalavg0_St_Parkleft : int;
+    finalavg1_St_Parkleft : int; finalavg2_St_Parkleft : int;
+    finalavg3_St_Parkleft : int; finalavg4_St_Parkleft : int;
+    whiteavgsen0_St_Parkleft : int; whiteavgsen1_St_Parkleft : int;
+    whiteavgsen2_St_Parkleft : int; whiteavgsen3_St_Parkleft : int;
+    whiteavgsen4_St_Parkleft : int; lastcountwhite_St_Parkleft : int;
+    ns_St_Parkleft : st; nr_St_Parkleft : bool; v_l_St_Parkright : int;
+    v_r_St_Parkright : int; direction_St_Parkright : int;
+    rightTurn_St_Parkright : bool; uTurn_St_Parkright : bool;
+    error_St_Parkright : int; p_St_Parkright : int; i_St_Parkright : int;
+    d_St_Parkright : int; pid_value_St_Parkright : int;
+    number_St_Parkright : int; dir_St_Parkright : int;
+    act0_St_Parkright : int; act1_St_Parkright : int;
+    act2_St_Parkright : int; act3_St_Parkright : int;
+    act4_St_Parkright : int; sum_St_Parkright : int; left_St_Parkright : int;
+    right_St_Parkright : int; objectCounter_St_Parkright : int;
+    objectLeftCounter_St_Parkright : int; stopCounter_St_Parkright : int;
+    parklefttimer_St_Parkright : int; parkrighttimer_St_Parkright : int;
+    parkdir_St_Parkright : int; parkingelapse_St_Parkright : int;
+    checkparkhere_St_Parkright : int; navigation_St_Parkright : int;
+    rightCounter_St_Parkright : int; finalavg0_St_Parkright : int;
+    finalavg1_St_Parkright : int; finalavg2_St_Parkright : int;
+    finalavg3_St_Parkright : int; finalavg4_St_Parkright : int;
+    whiteavgsen0_St_Parkright : int; whiteavgsen1_St_Parkright : int;
+    whiteavgsen2_St_Parkright : int; whiteavgsen3_St_Parkright : int;
+    whiteavgsen4_St_Parkright : int; lastcountwhite_St_Parkright : int;
+    ns_St_Parkright : st; nr_St_Parkright : bool; v_l_St_Stopstate : int;
+    v_r_St_Stopstate : int; direction_St_Stopstate : int;
+    rightTurn_St_Stopstate : bool; uTurn_St_Stopstate : bool;
+    error_St_Stopstate : int; p_St_Stopstate : int; i_St_Stopstate : int;
+    d_St_Stopstate : int; pid_value_St_Stopstate : int;
+    number_St_Stopstate : int; dir_St_Stopstate : int;
+    act0_St_Stopstate : int; act1_St_Stopstate : int;
+    act2_St_Stopstate : int; act3_St_Stopstate : int;
+    act4_St_Stopstate : int; sum_St_Stopstate : int; left_St_Stopstate : int;
+    right_St_Stopstate : int; objectCounter_St_Stopstate : int;
+    objectLeftCounter_St_Stopstate : int; stopCounter_St_Stopstate : int;
+    parklefttimer_St_Stopstate : int; parkrighttimer_St_Stopstate : int;
+    parkdir_St_Stopstate : int; parkingelapse_St_Stopstate : int;
+    checkparkhere_St_Stopstate : int; navigation_St_Stopstate : int;
+    rightCounter_St_Stopstate : int; finalavg0_St_Stopstate : int;
+    finalavg1_St_Stopstate : int; finalavg2_St_Stopstate : int;
+    finalavg3_St_Stopstate : int; finalavg4_St_Stopstate : int;
+    whiteavgsen0_St_Stopstate : int; whiteavgsen1_St_Stopstate : int;
+    whiteavgsen2_St_Stopstate : int; whiteavgsen3_St_Stopstate : int;
+    whiteavgsen4_St_Stopstate : int; lastcountwhite_St_Stopstate : int;
+    ns_St_Stopstate : st; nr_St_Stopstate : bool; v_412 : bool; v_413 : bool;
+    v_414 : int; v_415 : int; v_416 : bool; v_417 : int; v_418 : int;
+    v_419 : bool; v_420 : int; v_421 : int; v_422 : bool; v_423 : int;
+    v_424 : int; v_425 : bool; v_426 : int; v_427 : int; v_428 : bool;
+    v_429 : int; v_430 : int; v_431 : bool; v_432 : int; v_433 : int;
+    v_434 : bool; v_435 : int; v_436 : int; v_437 : bool; v_438 : int;
+    v_439 : int; v_440 : bool; v_441 : int; v_442 : int; v_443 : bool;
+    v_444 : bool; v_445 : int; v_446 : bool; v_447 : int; v_448 : bool;
+    v_449 : int; v_450 : bool; v_451 : int; v_452 : bool; v_453 : int;
+    v_338 : bool; v_339 : bool; v_340 : bool; v_341 : bool; v_342 : bool;
+    v_343 : bool; v_344 : bool; v_345 : bool; v_346 : bool; v_347 : bool;
+    v_348 : bool; v_349 : bool; v_350 : bool; v_351 : bool; v_352 : bool;
+    v_353 : bool; v_354 : bool; v_355 : bool; v_356 : bool; v_357 : bool;
+    v_358 : bool; v_359 : bool; v_360 : bool; v_361 : bool; v_362 : bool;
+    v_363 : bool; v_364 : bool; v_365 : bool; v_366 : bool; v_367 : int;
+    v_368 : bool; v_369 : int; v_370 : bool; v_371 : int; v_372 : bool;
+    v_373 : int; v_374 : bool; v_375 : int; v_376 : bool; v_377 : int;
+    v_378 : int; v_379 : int; v_380 : int; v_381 : int; v_382 : int;
+    v_383 : int; v_384 : int; v_385 : int; v_386 : int; v_387 : int;
+    v_388 : int; v_389 : int; v_390 : int; v_391 : int; v_392 : int;
+    v_393 : int; v_394 : int; v_395 : int; v_396 : int; v_397 : int;
+    v_398 : int; v_399 : bool; v_400 : bool; v_401 : int; v_402 : int;
+    v_403 : bool; v_404 : bool; v_405 : int; v_406 : int; v_407 : bool;
+    v_408 : bool; v_409 : bool; v_410 : bool; v_411 : int; v_297 : int;
+    v_298 : bool; v_299 : int; v_300 : bool; v_301 : int; v_302 : bool;
+    v_303 : int; v_304 : bool; v_305 : int; v_306 : bool; v_307 : int;
+    v_308 : int; v_309 : int; v_310 : int; v_311 : int; v_312 : int;
+    v_313 : int; v_314 : int; v_315 : int; v_316 : int; v_317 : int;
+    v_318 : int; v_319 : int; v_320 : int; v_321 : int; v_322 : int;
+    v_323 : int; v_324 : int; v_325 : int; v_326 : int; v_327 : int;
+    v_328 : int; v_329 : bool; v_330 : bool; v_331 : bool; v_332 : bool;
+    v_333 : bool; v_334 : bool; v_335 : bool; v_336 : int; v_337 : bool;
+    v_286 : bool; v_287 : int; v_288 : bool; v_289 : int; v_290 : bool;
+    v_291 : int; v_292 : bool; v_293 : int; v_294 : bool; v_295 : int;
+    v_296 : bool; v_268 : bool; v_269 : bool; v_270 : bool; v_271 : st;
+    v_272 : bool; v_273 : int; v_274 : bool; v_275 : int; v_276 : bool;
+    v_277 : int; v_278 : bool; v_279 : int; v_280 : bool; v_281 : int;
+    v_282 : bool; v_283 : int; v_284 : int; v_285 : int; v_243 : bool;
+    v_244 : bool; v_245 : bool; v_246 : st; v_247 : bool; v_248 : st;
+    v_249 : bool; v_250 : int; v_251 : bool; v_252 : int; v_253 : bool;
+    v_254 : int; v_255 : bool; v_256 : int; v_257 : bool; v_258 : int;
+    v_259 : bool; v_260 : bool; v_261 : int; v_262 : bool; v_263 : bool;
+    v_264 : bool; v_265 : int; v_266 : int; v_267 : int; v_227 : bool;
+    v_228 : bool; v_229 : bool; v_230 : int; v_231 : bool; v_232 : int;
+    v_233 : bool; v_234 : int; v_235 : bool; v_236 : int; v_237 : bool;
+    v_238 : int; v_239 : bool; v_240 : int; v_241 : int; v_242 : int;
+    count : int; v_160 : bool; v_161 : bool; v_162 : st; v_163 : bool;
+    v_164 : st; v_165 : bool; v_166 : st; v_167 : bool; v_168 : int;
+    v_169 : bool; v_170 : int; v_171 : bool; v_172 : int; v_173 : bool;
+    v_174 : int; v_175 : bool; v_176 : int; v_177 : bool; v_178 : int;
+    v_179 : int; v_180 : int; v_181 : int; v_182 : int; v_183 : int;
+    v_184 : int; v_185 : int; v_186 : int; v_187 : int; v_188 : int;
+    v_189 : int; v_190 : int; v_191 : int; v_192 : int; v_193 : int;
+    v_194 : int; v_195 : int; v_196 : int; v_197 : int; v_198 : int;
+    v_199 : int; v_200 : bool; v_201 : bool; v_202 : bool; v_203 : bool;
+    v_204 : bool; v_205 : bool; v_206 : bool; v_207 : int; v_208 : bool;
+    v_209 : int; v_210 : bool; v_211 : bool; v_212 : bool; v_213 : bool;
+    v_214 : bool; v_215 : bool; v_216 : bool; v_217 : bool; v_218 : bool;
+    v_219 : bool; v_220 : bool; v_221 : int; v_222 : int; v_223 : int;
+    v_224 : bool; v_225 : bool; v_226 : int; count_1 : int; v_127 : bool;
+    v_128 : bool; v_129 : bool; v_130 : st; v_131 : bool; v_132 : int;
+    v_133 : bool; v_134 : int; v_135 : bool; v_136 : int; v_137 : bool;
+    v_138 : int; v_139 : bool; v_140 : int; v_141 : bool; v_142 : int;
+    v_143 : int; v_144 : int; v_145 : bool; v_146 : bool; v_147 : bool;
+    v_148 : bool; v_149 : bool; v_150 : bool; v_151 : bool; v_152 : bool;
+    v_153 : bool; v_154 : bool; v_155 : bool; v_156 : int; v_157 : int;
+    v_158 : int; v_159 : bool; v_113 : bool; v_114 : int; v_115 : bool;
+    v_116 : int; v_117 : bool; v_118 : int; v_119 : bool; v_120 : int;
+    v_121 : bool; v_122 : int; v_123 : bool; v_124 : int; v_125 : int;
+    v_126 : int; v_30 : bool; v_31 : bool; v_32 : st; v_33 : bool;
+    v_34 : int; v_35 : bool; v_36 : int; v_37 : bool; v_38 : int;
+    v_39 : bool; v_40 : int; v_41 : bool; v_42 : int; v_43 : bool;
+    v_44 : int; v_45 : int; v_46 : int; v_47 : int; v_48 : int; v_49 : int;
+    v_50 : int; v_51 : int; v_52 : int; v_53 : int; v_54 : int; v_55 : int;
+    v_56 : int; v_57 : int; v_58 : int; v_59 : int; v_60 : int; v_61 : int;
+    v_62 : int; v_63 : int; v_64 : int; v_65 : int; v_66 : bool; v_67 : bool;
+    v_68 : int; v_69 : int; v_70 : bool; v_71 : bool; v_72 : bool;
+    v_73 : bool; v_74 : bool; v_75 : bool; v_76 : int; v_77 : int;
+    v_78 : int; v_79 : int; v_80 : int; v_81 : bool; v_82 : bool;
+    v_83 : bool; v_84 : bool; v_85 : bool; v_86 : bool; v_87 : bool;
+    v_88 : int; v_89 : int; v_90 : bool; v_91 : bool; v_92 : bool;
+    v_93 : bool; v_94 : bool; v_95 : bool; v_96 : bool; v_97 : bool;
+    v_98 : bool; v_99 : bool; v_100 : bool; v_101 : bool; v_102 : bool;
+    v_103 : int; v_104 : int; v_105 : int; v_106 : int; v_107 : bool;
+    v_108 : bool; v_109 : int; v_110 : bool; v_111 : bool; v_112 : int;
+    v_15 : bool; v_16 : bool; v_17 : bool; v_18 : int; v_19 : bool;
+    v_20 : int; v_21 : int; v_22 : int; v_23 : bool; v_24 : bool; v_25 : int;
+    v_26 : bool; v_27 : bool; v_28 : int; v_29 : bool; v : bool; v_1 : bool;
+    v_2 : bool; v_3 : int; v_4 : bool; v_5 : int; v_6 : int; v_7 : int;
+    v_8 : bool; v_9 : bool; v_10 : int; v_11 : bool; v_12 : bool; v_13 : int;
+    v_14 : bool;
+let
+  lastcountwhite_1 = 0 fby lastcountwhite;
+  whiteavgsen4_1 = 0 fby whiteavgsen4;
+  whiteavgsen3_1 = 0 fby whiteavgsen3;
+  whiteavgsen2_1 = 0 fby whiteavgsen2;
+  whiteavgsen1_1 = 0 fby whiteavgsen1;
+  whiteavgsen0_1 = 0 fby whiteavgsen0;
+  finalavg4_1 = 0 fby finalavg4;
+  finalavg3_1 = 0 fby finalavg3;
+  finalavg2_1 = 0 fby finalavg2;
+  finalavg1_1 = 0 fby finalavg1;
+  finalavg0_1 = 0 fby finalavg0;
+  rightCounter_1 = 0 fby rightCounter;
+  navigation_1 = pre navigation;
+  checkparkhere_1 = pre checkparkhere;
+  parkingelapse_1 = pre parkingelapse;
+  parkdir_1 = pre parkdir;
+  parkrighttimer_1 = 1 fby parkrighttimer;
+  parklefttimer_1 = 1 fby parklefttimer;
+  stopCounter_1 = 0 fby stopCounter;
+  objectLeftCounter_1 = 0 fby objectLeftCounter;
+  objectCounter_1 = 0 fby objectCounter;
+  right_1 = 0 fby right;
+  left_1 = 0 fby left;
+  sum_1 = 0 fby sum;
+  act4_1 = 0 fby act4;
+  act3_1 = 0 fby act3;
+  act2_1 = 0 fby act2;
+  act1_1 = 0 fby act1;
+  act0_1 = 0 fby act0;
+  dir_1 = 0 fby dir;
+  number_1 = 20 fby number;
+  pid_value_1 = 0 fby pid_value;
+  d_1 = 0 fby d;
+  i_1 = 0 fby i;
+  p_1 = 0 fby p;
+  error_1 = 0 fby error;
+  uTurn_1 = false fby uTurn;
+  rightTurn_1 = false fby rightTurn;
+  r = pnr;
+  pnr = false fby nr;
+  ck = St_WhitelineFollower fby ns;
+  rightCounter_St_WhitelineFollower =
+    (rightCounter_1 when St_WhitelineFollower(ck));
+  navigation_St_WhitelineFollower =
+    (navigation_1 when St_WhitelineFollower(ck));
+  checkparkhere_St_WhitelineFollower =
+    (checkparkhere_1 when St_WhitelineFollower(ck));
+  parkingelapse_St_WhitelineFollower =
+    (parkingelapse_1 when St_WhitelineFollower(ck));
+  parkdir_St_WhitelineFollower = (parkdir_1 when St_WhitelineFollower(ck));
+  parkrighttimer_St_WhitelineFollower =
+    (parkrighttimer_1 when St_WhitelineFollower(ck));
+  parklefttimer_St_WhitelineFollower =
+    (parklefttimer_1 when St_WhitelineFollower(ck));
+  stopCounter_St_WhitelineFollower =
+    (stopCounter_1 when St_WhitelineFollower(ck));
+  objectLeftCounter_St_WhitelineFollower =
+    (objectLeftCounter_1 when St_WhitelineFollower(ck));
+  objectCounter_St_WhitelineFollower =
+    (objectCounter_1 when St_WhitelineFollower(ck));
+  right_St_WhitelineFollower = (right_1 when St_WhitelineFollower(ck));
+  left_St_WhitelineFollower = (left_1 when St_WhitelineFollower(ck));
+  sum_St_WhitelineFollower = (sum_1 when St_WhitelineFollower(ck));
+  act4_St_WhitelineFollower = (act4_1 when St_WhitelineFollower(ck));
+  act3_St_WhitelineFollower = (act3_1 when St_WhitelineFollower(ck));
+  act2_St_WhitelineFollower = (act2_1 when St_WhitelineFollower(ck));
+  act1_St_WhitelineFollower = (act1_1 when St_WhitelineFollower(ck));
+  act0_St_WhitelineFollower = (act0_1 when St_WhitelineFollower(ck));
+  dir_St_WhitelineFollower = (dir_1 when St_WhitelineFollower(ck));
+  number_St_WhitelineFollower = (number_1 when St_WhitelineFollower(ck));
+  pid_value_St_WhitelineFollower =
+    (pid_value_1 when St_WhitelineFollower(ck));
+  d_St_WhitelineFollower = (d_1 when St_WhitelineFollower(ck));
+  i_St_WhitelineFollower = (i_1 when St_WhitelineFollower(ck));
+  p_St_WhitelineFollower = (p_1 when St_WhitelineFollower(ck));
+  error_St_WhitelineFollower = (error_1 when St_WhitelineFollower(ck));
+  uTurn_St_WhitelineFollower = (uTurn_1 when St_WhitelineFollower(ck));
+  rightTurn_St_WhitelineFollower =
+    (rightTurn_1 when St_WhitelineFollower(ck));
+  finalavg4_St_WhitelineFollower = if v_452 then v_453 else 0;
+  v_453 = ((whiteavgsen4_1 when St_WhitelineFollower(ck)) - 150);
+  v_452 = ((lastcountwhite when St_WhitelineFollower(ck)) > 3000);
+  finalavg3_St_WhitelineFollower = if v_450 then v_451 else 0;
+  v_451 = ((whiteavgsen3_1 when St_WhitelineFollower(ck)) - 150);
+  v_450 = ((lastcountwhite when St_WhitelineFollower(ck)) > 3000);
+  finalavg2_St_WhitelineFollower = if v_448 then v_449 else 0;
+  v_449 = ((whiteavgsen2_1 when St_WhitelineFollower(ck)) - 150);
+  v_448 = ((lastcountwhite when St_WhitelineFollower(ck)) > 3000);
+  finalavg1_St_WhitelineFollower = if v_446 then v_447 else 0;
+  v_447 = ((whiteavgsen1_1 when St_WhitelineFollower(ck)) - 150);
+  v_446 = ((lastcountwhite when St_WhitelineFollower(ck)) > 3000);
+  finalavg0_St_WhitelineFollower = if v_444 then v_445 else 0;
+  v_445 = ((whiteavgsen0_1 when St_WhitelineFollower(ck)) - 150);
+  v_444 = ((lastcountwhite when St_WhitelineFollower(ck)) > 3000);
+  direction_St_WhitelineFollower = if v_443 then 2 else 100;
+  v_443 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  v_r_St_WhitelineFollower = 35;
+  v_l_St_WhitelineFollower = 35;
+  whiteavgsen4_St_WhitelineFollower = if v_437 then v_439 else v_442;
+  v_442 =
+    if v_440 then v_441 else (whiteavgsen4_1 when St_WhitelineFollower(ck));
+  v_441 = ((whiteavgsen4_1 when St_WhitelineFollower(ck)) / 3000);
+  v_440 = ((lastcountwhite when St_WhitelineFollower(ck)) = 3000);
+  v_439 = ((whiteavgsen4_1 when St_WhitelineFollower(ck)) + v_438);
+  v_438 = (sen when St_WhitelineFollower(ck))[4];
+  v_437 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  whiteavgsen3_St_WhitelineFollower = if v_431 then v_433 else v_436;
+  v_436 =
+    if v_434 then v_435 else (whiteavgsen3_1 when St_WhitelineFollower(ck));
+  v_435 = ((whiteavgsen3_1 when St_WhitelineFollower(ck)) / 3000);
+  v_434 = ((lastcountwhite when St_WhitelineFollower(ck)) = 3000);
+  v_433 = ((whiteavgsen3_1 when St_WhitelineFollower(ck)) + v_432);
+  v_432 = (sen when St_WhitelineFollower(ck))[3];
+  v_431 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  whiteavgsen2_St_WhitelineFollower = if v_425 then v_427 else v_430;
+  v_430 =
+    if v_428 then v_429 else (whiteavgsen2_1 when St_WhitelineFollower(ck));
+  v_429 = ((whiteavgsen2_1 when St_WhitelineFollower(ck)) / 3000);
+  v_428 = ((lastcountwhite when St_WhitelineFollower(ck)) = 3000);
+  v_427 = ((whiteavgsen2_1 when St_WhitelineFollower(ck)) + v_426);
+  v_426 = (sen when St_WhitelineFollower(ck))[2];
+  v_425 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  whiteavgsen1_St_WhitelineFollower = if v_419 then v_421 else v_424;
+  v_424 =
+    if v_422 then v_423 else (whiteavgsen1_1 when St_WhitelineFollower(ck));
+  v_423 = ((whiteavgsen1_1 when St_WhitelineFollower(ck)) / 3000);
+  v_422 = ((lastcountwhite when St_WhitelineFollower(ck)) = 3000);
+  v_421 = ((whiteavgsen1_1 when St_WhitelineFollower(ck)) + v_420);
+  v_420 = (sen when St_WhitelineFollower(ck))[1];
+  v_419 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  whiteavgsen0_St_WhitelineFollower = if v_413 then v_415 else v_418;
+  v_418 =
+    if v_416 then v_417 else (whiteavgsen0_1 when St_WhitelineFollower(ck));
+  v_417 = ((whiteavgsen0_1 when St_WhitelineFollower(ck)) / 3000);
+  v_416 = ((lastcountwhite when St_WhitelineFollower(ck)) = 3000);
+  v_415 = ((whiteavgsen0_1 when St_WhitelineFollower(ck)) + v_414);
+  v_414 = (sen when St_WhitelineFollower(ck))[0];
+  v_413 = ((lastcountwhite when St_WhitelineFollower(ck)) < 3000);
+  lastcountwhite_St_WhitelineFollower =
+    ((lastcountwhite_1 when St_WhitelineFollower(ck)) + 1);
+  nr_St_WhitelineFollower = if v_412 then true else false;
+  ns_St_WhitelineFollower =
+    if v_412 then St_Whiteline else St_WhitelineFollower;
+  v_412 = ((lastcountwhite when St_WhitelineFollower(ck)) = 5000);
+  lastcountwhite_St_Whiteline = (lastcountwhite_1 when St_Whiteline(ck));
+  whiteavgsen4_St_Whiteline = (whiteavgsen4_1 when St_Whiteline(ck));
+  whiteavgsen3_St_Whiteline = (whiteavgsen3_1 when St_Whiteline(ck));
+  whiteavgsen2_St_Whiteline = (whiteavgsen2_1 when St_Whiteline(ck));
+  whiteavgsen1_St_Whiteline = (whiteavgsen1_1 when St_Whiteline(ck));
+  whiteavgsen0_St_Whiteline = (whiteavgsen0_1 when St_Whiteline(ck));
+  finalavg4_St_Whiteline = (finalavg4_1 when St_Whiteline(ck));
+  finalavg3_St_Whiteline = (finalavg3_1 when St_Whiteline(ck));
+  finalavg2_St_Whiteline = (finalavg2_1 when St_Whiteline(ck));
+  finalavg1_St_Whiteline = (finalavg1_1 when St_Whiteline(ck));
+  finalavg0_St_Whiteline = (finalavg0_1 when St_Whiteline(ck));
+  rightCounter_St_Whiteline = (rightCounter_1 when St_Whiteline(ck));
+  navigation_St_Whiteline = (navigation_1 when St_Whiteline(ck));
+  checkparkhere_St_Whiteline = (checkparkhere_1 when St_Whiteline(ck));
+  parkingelapse_St_Whiteline = (parkingelapse_1 when St_Whiteline(ck));
+  parkdir_St_Whiteline = (parkdir_1 when St_Whiteline(ck));
+  parkrighttimer_St_Whiteline = (parkrighttimer_1 when St_Whiteline(ck));
+  parklefttimer_St_Whiteline = (parklefttimer_1 when St_Whiteline(ck));
+  stopCounter_St_Whiteline = (stopCounter_1 when St_Whiteline(ck));
+  objectLeftCounter_St_Whiteline =
+    (objectLeftCounter_1 when St_Whiteline(ck));
+  objectCounter_St_Whiteline = (objectCounter_1 when St_Whiteline(ck));
+  uTurn_St_Whiteline = (uTurn_1 when St_Whiteline(ck));
+  rightTurn_St_Whiteline = (rightTurn_1 when St_Whiteline(ck));
+  direction_St_Whiteline = (dir when St_Whiteline(ck));
+  dir_St_Whiteline = if v_409 then 1 else v_411;
+  v_411 = if v_410 then 2 else 0;
+  v_410 = ((error when St_Whiteline(ck)) > 5);
+  v_409 = ((error when St_Whiteline(ck)) < ~-(5));
+  v_r_St_Whiteline = if v_408 then 0 else (right when St_Whiteline(ck));
+  v_408 = ((right when St_Whiteline(ck)) < 0);
+  v_l_St_Whiteline = if v_407 then 0 else (left when St_Whiteline(ck));
+  v_407 = ((left when St_Whiteline(ck)) < 0);
+  right_St_Whiteline = if v_403 then 50 else v_406;
+  v_406 = if v_404 then 50 else v_405;
+  v_405 = (50 - (pid_value when St_Whiteline(ck)));
+  v_404 = ((error when St_Whiteline(ck)) > 5);
+  v_403 = ((error when St_Whiteline(ck)) < ~-(5));
+  left_St_Whiteline = if v_399 then 50 else v_402;
+  v_402 = if v_400 then 50 else v_401;
+  v_401 = (50 + (pid_value when St_Whiteline(ck)));
+  v_400 = ((error when St_Whiteline(ck)) > 5);
+  v_399 = ((error when St_Whiteline(ck)) < ~-(5));
+  pid_value_St_Whiteline = (v_398 + (d when St_Whiteline(ck)));
+  v_398 = (v_396 + v_397);
+  v_397 = ((i when St_Whiteline(ck)) / 1000);
+  v_396 = (3 * (p when St_Whiteline(ck)));
+  d_St_Whiteline =
+    ((error when St_Whiteline(ck)) - (error_1 when St_Whiteline(ck)));
+  i_St_Whiteline =
+    ((i_1 when St_Whiteline(ck)) + (error when St_Whiteline(ck)));
+  p_St_Whiteline = (error when St_Whiteline(ck));
+  error_St_Whiteline = (v_394 + v_395);
+  v_395 = (10 * (act4 when St_Whiteline(ck)));
+  v_394 = (v_392 + v_393);
+  v_393 = (5 * (act3 when St_Whiteline(ck)));
+  v_392 = (v_390 + v_391);
+  v_391 = (0 * (act2 when St_Whiteline(ck)));
+  v_390 = (v_388 + v_389);
+  v_389 = (~-(5) * (act1 when St_Whiteline(ck)));
+  v_388 = (~-(10) * (act0 when St_Whiteline(ck)));
+  number_St_Whiteline = (v_387 + (act4 when St_Whiteline(ck)));
+  v_387 = (v_386 + (act3 when St_Whiteline(ck)));
+  v_386 = (v_385 + (act2 when St_Whiteline(ck)));
+  v_385 = ((act0 when St_Whiteline(ck)) + (act1 when St_Whiteline(ck)));
+  sum_St_Whiteline = (v_383 + v_384);
+  v_384 = (sen when St_Whiteline(ck))[4];
+  v_383 = (v_381 + v_382);
+  v_382 = (sen when St_Whiteline(ck))[3];
+  v_381 = (v_379 + v_380);
+  v_380 = (sen when St_Whiteline(ck))[2];
+  v_379 = (v_377 + v_378);
+  v_378 = (sen when St_Whiteline(ck))[1];
+  v_377 = (sen when St_Whiteline(ck))[0];
+  act4_St_Whiteline = if v_376 then 0 else 1;
+  v_376 = (v_375 <= (finalavg4_1 when St_Whiteline(ck)));
+  v_375 = (sen when St_Whiteline(ck))[4];
+  act3_St_Whiteline = if v_374 then 0 else 1;
+  v_374 = (v_373 <= (finalavg3_1 when St_Whiteline(ck)));
+  v_373 = (sen when St_Whiteline(ck))[3];
+  act2_St_Whiteline = if v_372 then 0 else 1;
+  v_372 = (v_371 <= (finalavg2_1 when St_Whiteline(ck)));
+  v_371 = (sen when St_Whiteline(ck))[2];
+  act1_St_Whiteline = if v_370 then 0 else 1;
+  v_370 = (v_369 <= (finalavg1_1 when St_Whiteline(ck)));
+  v_369 = (sen when St_Whiteline(ck))[1];
+  act0_St_Whiteline = if v_368 then 0 else 1;
+  v_368 = (v_367 <= (finalavg0_1 when St_Whiteline(ck)));
+  v_367 = (sen when St_Whiteline(ck))[0];
+  nr_St_Whiteline = if v_366 then true else false;
+  ns_St_Whiteline = if v_366 then St_LineSwitch else St_Whiteline;
+  v_366 = (v_356 or v_365);
+  v_365 = (v_363 & v_364);
+  v_364 = ((act4 when St_Whiteline(ck)) = 1);
+  v_363 = (v_361 & v_362);
+  v_362 = ((act3 when St_Whiteline(ck)) = 0);
+  v_361 = (v_359 & v_360);
+  v_360 = ((act2 when St_Whiteline(ck)) = 1);
+  v_359 = (v_357 & v_358);
+  v_358 = ((act1 when St_Whiteline(ck)) = 1);
+  v_357 = ((act0 when St_Whiteline(ck)) = 1);
+  v_356 = (v_346 or v_355);
+  v_355 = (v_353 & v_354);
+  v_354 = ((act4 when St_Whiteline(ck)) = 1);
+  v_353 = (v_351 & v_352);
+  v_352 = ((act3 when St_Whiteline(ck)) = 1);
+  v_351 = (v_349 & v_350);
+  v_350 = ((act2 when St_Whiteline(ck)) = 0);
+  v_349 = (v_347 & v_348);
+  v_348 = ((act1 when St_Whiteline(ck)) = 1);
+  v_347 = ((act0 when St_Whiteline(ck)) = 1);
+  v_346 = (v_344 & v_345);
+  v_345 = ((act4 when St_Whiteline(ck)) = 1);
+  v_344 = (v_342 & v_343);
+  v_343 = ((act3 when St_Whiteline(ck)) = 1);
+  v_342 = (v_340 & v_341);
+  v_341 = ((act2 when St_Whiteline(ck)) = 1);
+  v_340 = (v_338 & v_339);
+  v_339 = ((act1 when St_Whiteline(ck)) = 0);
+  v_338 = ((act0 when St_Whiteline(ck)) = 1);
+  lastcountwhite_St_LineSwitch = (lastcountwhite_1 when St_LineSwitch(ck));
+  whiteavgsen4_St_LineSwitch = (whiteavgsen4_1 when St_LineSwitch(ck));
+  whiteavgsen3_St_LineSwitch = (whiteavgsen3_1 when St_LineSwitch(ck));
+  whiteavgsen2_St_LineSwitch = (whiteavgsen2_1 when St_LineSwitch(ck));
+  whiteavgsen1_St_LineSwitch = (whiteavgsen1_1 when St_LineSwitch(ck));
+  whiteavgsen0_St_LineSwitch = (whiteavgsen0_1 when St_LineSwitch(ck));
+  finalavg4_St_LineSwitch = (finalavg4_1 when St_LineSwitch(ck));
+  finalavg3_St_LineSwitch = (finalavg3_1 when St_LineSwitch(ck));
+  finalavg2_St_LineSwitch = (finalavg2_1 when St_LineSwitch(ck));
+  finalavg1_St_LineSwitch = (finalavg1_1 when St_LineSwitch(ck));
+  finalavg0_St_LineSwitch = (finalavg0_1 when St_LineSwitch(ck));
+  navigation_St_LineSwitch = (navigation_1 when St_LineSwitch(ck));
+  checkparkhere_St_LineSwitch = (checkparkhere_1 when St_LineSwitch(ck));
+  parkingelapse_St_LineSwitch = (parkingelapse_1 when St_LineSwitch(ck));
+  parkdir_St_LineSwitch = (parkdir_1 when St_LineSwitch(ck));
+  parkrighttimer_St_LineSwitch = (parkrighttimer_1 when St_LineSwitch(ck));
+  parklefttimer_St_LineSwitch = (parklefttimer_1 when St_LineSwitch(ck));
+  stopCounter_St_LineSwitch = (stopCounter_1 when St_LineSwitch(ck));
+  objectLeftCounter_St_LineSwitch =
+    (objectLeftCounter_1 when St_LineSwitch(ck));
+  objectCounter_St_LineSwitch = (objectCounter_1 when St_LineSwitch(ck));
+  uTurn_St_LineSwitch = (uTurn_1 when St_LineSwitch(ck));
+  rightTurn_St_LineSwitch = if v_337 then true else false;
+  v_337 = ((rightCounter when St_LineSwitch(ck)) > 50);
+  rightCounter_St_LineSwitch = if v_335 then v_336 else 0;
+  v_336 = ((rightCounter_1 when St_LineSwitch(ck)) + 1);
+  v_335 = (v_333 & v_334);
+  v_334 = ((act3 when St_LineSwitch(ck)) = 1);
+  v_333 = (v_331 & v_332);
+  v_332 = ((act2 when St_LineSwitch(ck)) = 1);
+  v_331 = ((act1 when St_LineSwitch(ck)) = 1);
+  direction_St_LineSwitch = (dir when St_LineSwitch(ck));
+  v_r_St_LineSwitch = if v_330 then 0 else (right when St_LineSwitch(ck));
+  v_330 = ((right when St_LineSwitch(ck)) < 0);
+  v_l_St_LineSwitch = if v_329 then 0 else (left when St_LineSwitch(ck));
+  v_329 = ((left when St_LineSwitch(ck)) < 0);
+  dir_St_LineSwitch = 0;
+  right_St_LineSwitch = (30 - (pid_value when St_LineSwitch(ck)));
+  left_St_LineSwitch = (30 + (pid_value when St_LineSwitch(ck)));
+  pid_value_St_LineSwitch = (v_328 + (d when St_LineSwitch(ck)));
+  v_328 = (v_326 + v_327);
+  v_327 = ((i when St_LineSwitch(ck)) / 1000);
+  v_326 = (2 * (p when St_LineSwitch(ck)));
+  d_St_LineSwitch =
+    ((error when St_LineSwitch(ck)) - (error_1 when St_LineSwitch(ck)));
+  i_St_LineSwitch =
+    ((i_1 when St_LineSwitch(ck)) + (error when St_LineSwitch(ck)));
+  p_St_LineSwitch = (error when St_LineSwitch(ck));
+  error_St_LineSwitch = (v_324 + v_325);
+  v_325 = (4 * (act4 when St_LineSwitch(ck)));
+  v_324 = (v_322 + v_323);
+  v_323 = (3 * (act3 when St_LineSwitch(ck)));
+  v_322 = (v_320 + v_321);
+  v_321 = (0 * (act2 when St_LineSwitch(ck)));
+  v_320 = (v_318 + v_319);
+  v_319 = (~-(3) * (act1 when St_LineSwitch(ck)));
+  v_318 = (~-(4) * (act0 when St_LineSwitch(ck)));
+  number_St_LineSwitch = (v_317 + (act4 when St_LineSwitch(ck)));
+  v_317 = (v_316 + (act3 when St_LineSwitch(ck)));
+  v_316 = (v_315 + (act2 when St_LineSwitch(ck)));
+  v_315 = ((act0 when St_LineSwitch(ck)) + (act1 when St_LineSwitch(ck)));
+  sum_St_LineSwitch = (v_313 + v_314);
+  v_314 = (sen when St_LineSwitch(ck))[4];
+  v_313 = (v_311 + v_312);
+  v_312 = (sen when St_LineSwitch(ck))[3];
+  v_311 = (v_309 + v_310);
+  v_310 = (sen when St_LineSwitch(ck))[2];
+  v_309 = (v_307 + v_308);
+  v_308 = (sen when St_LineSwitch(ck))[1];
+  v_307 = (sen when St_LineSwitch(ck))[0];
+  act4_St_LineSwitch = if v_306 then 1 else 0;
+  v_306 = (v_305 <= (finalavg4_1 when St_LineSwitch(ck)));
+  v_305 = (sen when St_LineSwitch(ck))[4];
+  act3_St_LineSwitch = if v_304 then 1 else 0;
+  v_304 = (v_303 <= (finalavg3_1 when St_LineSwitch(ck)));
+  v_303 = (sen when St_LineSwitch(ck))[3];
+  act2_St_LineSwitch = if v_302 then 1 else 0;
+  v_302 = (v_301 <= (finalavg2_1 when St_LineSwitch(ck)));
+  v_301 = (sen when St_LineSwitch(ck))[2];
+  act1_St_LineSwitch = if v_300 then 1 else 0;
+  v_300 = (v_299 <= (finalavg1_1 when St_LineSwitch(ck)));
+  v_299 = (sen when St_LineSwitch(ck))[1];
+  act0_St_LineSwitch = if v_298 then 1 else 0;
+  v_298 = (v_297 <= (finalavg0_1 when St_LineSwitch(ck)));
+  v_297 = (sen when St_LineSwitch(ck))[0];
+  nr_St_LineSwitch =
+    if (rightTurn when St_LineSwitch(ck)) then true else false;
+  ns_St_LineSwitch =
+    if (rightTurn when St_LineSwitch(ck))
+    then St_BlackRight
+    else St_LineSwitch;
+  lastcountwhite_St_ObstacleRight =
+    (lastcountwhite_1 when St_ObstacleRight(ck));
+  whiteavgsen4_St_ObstacleRight = (whiteavgsen4_1 when St_ObstacleRight(ck));
+  whiteavgsen3_St_ObstacleRight = (whiteavgsen3_1 when St_ObstacleRight(ck));
+  whiteavgsen2_St_ObstacleRight = (whiteavgsen2_1 when St_ObstacleRight(ck));
+  whiteavgsen1_St_ObstacleRight = (whiteavgsen1_1 when St_ObstacleRight(ck));
+  whiteavgsen0_St_ObstacleRight = (whiteavgsen0_1 when St_ObstacleRight(ck));
+  finalavg4_St_ObstacleRight = (finalavg4_1 when St_ObstacleRight(ck));
+  finalavg3_St_ObstacleRight = (finalavg3_1 when St_ObstacleRight(ck));
+  finalavg2_St_ObstacleRight = (finalavg2_1 when St_ObstacleRight(ck));
+  finalavg1_St_ObstacleRight = (finalavg1_1 when St_ObstacleRight(ck));
+  finalavg0_St_ObstacleRight = (finalavg0_1 when St_ObstacleRight(ck));
+  rightCounter_St_ObstacleRight = (rightCounter_1 when St_ObstacleRight(ck));
+  navigation_St_ObstacleRight = (navigation_1 when St_ObstacleRight(ck));
+  checkparkhere_St_ObstacleRight =
+    (checkparkhere_1 when St_ObstacleRight(ck));
+  parkingelapse_St_ObstacleRight =
+    (parkingelapse_1 when St_ObstacleRight(ck));
+  parkdir_St_ObstacleRight = (parkdir_1 when St_ObstacleRight(ck));
+  parkrighttimer_St_ObstacleRight =
+    (parkrighttimer_1 when St_ObstacleRight(ck));
+  parklefttimer_St_ObstacleRight =
+    (parklefttimer_1 when St_ObstacleRight(ck));
+  stopCounter_St_ObstacleRight = (stopCounter_1 when St_ObstacleRight(ck));
+  objectLeftCounter_St_ObstacleRight =
+    (objectLeftCounter_1 when St_ObstacleRight(ck));
+  objectCounter_St_ObstacleRight =
+    (objectCounter_1 when St_ObstacleRight(ck));
+  right_St_ObstacleRight = (right_1 when St_ObstacleRight(ck));
+  left_St_ObstacleRight = (left_1 when St_ObstacleRight(ck));
+  sum_St_ObstacleRight = (sum_1 when St_ObstacleRight(ck));
+  dir_St_ObstacleRight = (dir_1 when St_ObstacleRight(ck));
+  number_St_ObstacleRight = (number_1 when St_ObstacleRight(ck));
+  pid_value_St_ObstacleRight = (pid_value_1 when St_ObstacleRight(ck));
+  d_St_ObstacleRight = (d_1 when St_ObstacleRight(ck));
+  i_St_ObstacleRight = (i_1 when St_ObstacleRight(ck));
+  p_St_ObstacleRight = (p_1 when St_ObstacleRight(ck));
+  error_St_ObstacleRight = (error_1 when St_ObstacleRight(ck));
+  uTurn_St_ObstacleRight = (uTurn_1 when St_ObstacleRight(ck));
+  rightTurn_St_ObstacleRight = (rightTurn_1 when St_ObstacleRight(ck));
+  direction_St_ObstacleRight = 2;
+  v_r_St_ObstacleRight = 30;
+  v_l_St_ObstacleRight = 30;
+  act4_St_ObstacleRight = if v_296 then 1 else 0;
+  v_296 = (v_295 <= (finalavg4_1 when St_ObstacleRight(ck)));
+  v_295 = (sen when St_ObstacleRight(ck))[4];
+  act3_St_ObstacleRight = if v_294 then 1 else 0;
+  v_294 = (v_293 <= (finalavg3_1 when St_ObstacleRight(ck)));
+  v_293 = (sen when St_ObstacleRight(ck))[3];
+  act2_St_ObstacleRight = if v_292 then 1 else 0;
+  v_292 = (v_291 <= (finalavg2_1 when St_ObstacleRight(ck)));
+  v_291 = (sen when St_ObstacleRight(ck))[2];
+  act1_St_ObstacleRight = if v_290 then 1 else 0;
+  v_290 = (v_289 <= (finalavg1_1 when St_ObstacleRight(ck)));
+  v_289 = (sen when St_ObstacleRight(ck))[1];
+  act0_St_ObstacleRight = if v_288 then 1 else 0;
+  v_288 = (v_287 <= (finalavg0_1 when St_ObstacleRight(ck)));
+  v_287 = (sen when St_ObstacleRight(ck))[0];
+  nr_St_ObstacleRight = if v_286 then true else false;
+  ns_St_ObstacleRight =
+    if v_286 then St_ObstacleForward else St_ObstacleRight;
+  v_286 = not((irsenLeft when St_ObstacleRight(ck)));
+  lastcountwhite_St_ObstacleForward =
+    (lastcountwhite_1 when St_ObstacleForward(ck));
+  whiteavgsen4_St_ObstacleForward =
+    (whiteavgsen4_1 when St_ObstacleForward(ck));
+  whiteavgsen3_St_ObstacleForward =
+    (whiteavgsen3_1 when St_ObstacleForward(ck));
+  whiteavgsen2_St_ObstacleForward =
+    (whiteavgsen2_1 when St_ObstacleForward(ck));
+  whiteavgsen1_St_ObstacleForward =
+    (whiteavgsen1_1 when St_ObstacleForward(ck));
+  whiteavgsen0_St_ObstacleForward =
+    (whiteavgsen0_1 when St_ObstacleForward(ck));
+  finalavg4_St_ObstacleForward = (finalavg4_1 when St_ObstacleForward(ck));
+  finalavg3_St_ObstacleForward = (finalavg3_1 when St_ObstacleForward(ck));
+  finalavg2_St_ObstacleForward = (finalavg2_1 when St_ObstacleForward(ck));
+  finalavg1_St_ObstacleForward = (finalavg1_1 when St_ObstacleForward(ck));
+  finalavg0_St_ObstacleForward = (finalavg0_1 when St_ObstacleForward(ck));
+  rightCounter_St_ObstacleForward =
+    (rightCounter_1 when St_ObstacleForward(ck));
+  navigation_St_ObstacleForward = (navigation_1 when St_ObstacleForward(ck));
+  checkparkhere_St_ObstacleForward =
+    (checkparkhere_1 when St_ObstacleForward(ck));
+  parkingelapse_St_ObstacleForward =
+    (parkingelapse_1 when St_ObstacleForward(ck));
+  parkdir_St_ObstacleForward = (parkdir_1 when St_ObstacleForward(ck));
+  parkrighttimer_St_ObstacleForward =
+    (parkrighttimer_1 when St_ObstacleForward(ck));
+  parklefttimer_St_ObstacleForward =
+    (parklefttimer_1 when St_ObstacleForward(ck));
+  stopCounter_St_ObstacleForward =
+    (stopCounter_1 when St_ObstacleForward(ck));
+  objectLeftCounter_St_ObstacleForward =
+    (objectLeftCounter_1 when St_ObstacleForward(ck));
+  objectCounter_St_ObstacleForward =
+    (objectCounter_1 when St_ObstacleForward(ck));
+  right_St_ObstacleForward = (right_1 when St_ObstacleForward(ck));
+  left_St_ObstacleForward = (left_1 when St_ObstacleForward(ck));
+  sum_St_ObstacleForward = (sum_1 when St_ObstacleForward(ck));
+  dir_St_ObstacleForward = (dir_1 when St_ObstacleForward(ck));
+  pid_value_St_ObstacleForward = (pid_value_1 when St_ObstacleForward(ck));
+  d_St_ObstacleForward = (d_1 when St_ObstacleForward(ck));
+  i_St_ObstacleForward = (i_1 when St_ObstacleForward(ck));
+  p_St_ObstacleForward = (p_1 when St_ObstacleForward(ck));
+  error_St_ObstacleForward = (error_1 when St_ObstacleForward(ck));
+  uTurn_St_ObstacleForward = (uTurn_1 when St_ObstacleForward(ck));
+  rightTurn_St_ObstacleForward = (rightTurn_1 when St_ObstacleForward(ck));
+  direction_St_ObstacleForward = 0;
+  v_r_St_ObstacleForward = 30;
+  v_l_St_ObstacleForward = 40;
+  number_St_ObstacleForward = (v_285 + (act4 when St_ObstacleForward(ck)));
+  v_285 = (v_284 + (act3 when St_ObstacleForward(ck)));
+  v_284 = (v_283 + (act2 when St_ObstacleForward(ck)));
+  v_283 =
+    ((act0 when St_ObstacleForward(ck)) + (act1 when St_ObstacleForward(ck)));
+  act4_St_ObstacleForward = if v_282 then 1 else 0;
+  v_282 = (v_281 <= (finalavg4_1 when St_ObstacleForward(ck)));
+  v_281 = (sen when St_ObstacleForward(ck))[4];
+  act3_St_ObstacleForward = if v_280 then 1 else 0;
+  v_280 = (v_279 <= (finalavg3_1 when St_ObstacleForward(ck)));
+  v_279 = (sen when St_ObstacleForward(ck))[3];
+  act2_St_ObstacleForward = if v_278 then 1 else 0;
+  v_278 = (v_277 <= (finalavg2_1 when St_ObstacleForward(ck)));
+  v_277 = (sen when St_ObstacleForward(ck))[2];
+  act1_St_ObstacleForward = if v_276 then 1 else 0;
+  v_276 = (v_275 <= (finalavg1_1 when St_ObstacleForward(ck)));
+  v_275 = (sen when St_ObstacleForward(ck))[1];
+  act0_St_ObstacleForward = if v_274 then 1 else 0;
+  v_274 = (v_273 <= (finalavg0_1 when St_ObstacleForward(ck)));
+  v_273 = (sen when St_ObstacleForward(ck))[0];
+  nr_St_ObstacleForward = if v_270 then true else v_272;
+  ns_St_ObstacleForward = if v_270 then St_ObstacleFinalRight else v_271;
+  v_272 = if (irsenLeft when St_ObstacleForward(ck)) then true else false;
+  v_271 =
+    if (irsenLeft when St_ObstacleForward(ck))
+    then St_ObstacleLeft
+    else St_ObstacleForward;
+  v_270 = (v_268 & v_269);
+  v_269 = ((act4 when St_ObstacleForward(ck)) = 1);
+  v_268 = ((number when St_ObstacleForward(ck)) = 1);
+  lastcountwhite_St_ObstacleLeft =
+    (lastcountwhite_1 when St_ObstacleLeft(ck));
+  whiteavgsen4_St_ObstacleLeft = (whiteavgsen4_1 when St_ObstacleLeft(ck));
+  whiteavgsen3_St_ObstacleLeft = (whiteavgsen3_1 when St_ObstacleLeft(ck));
+  whiteavgsen2_St_ObstacleLeft = (whiteavgsen2_1 when St_ObstacleLeft(ck));
+  whiteavgsen1_St_ObstacleLeft = (whiteavgsen1_1 when St_ObstacleLeft(ck));
+  whiteavgsen0_St_ObstacleLeft = (whiteavgsen0_1 when St_ObstacleLeft(ck));
+  finalavg4_St_ObstacleLeft = (finalavg4_1 when St_ObstacleLeft(ck));
+  finalavg3_St_ObstacleLeft = (finalavg3_1 when St_ObstacleLeft(ck));
+  finalavg2_St_ObstacleLeft = (finalavg2_1 when St_ObstacleLeft(ck));
+  finalavg1_St_ObstacleLeft = (finalavg1_1 when St_ObstacleLeft(ck));
+  finalavg0_St_ObstacleLeft = (finalavg0_1 when St_ObstacleLeft(ck));
+  rightCounter_St_ObstacleLeft = (rightCounter_1 when St_ObstacleLeft(ck));
+  navigation_St_ObstacleLeft = (navigation_1 when St_ObstacleLeft(ck));
+  checkparkhere_St_ObstacleLeft = (checkparkhere_1 when St_ObstacleLeft(ck));
+  parkingelapse_St_ObstacleLeft = (parkingelapse_1 when St_ObstacleLeft(ck));
+  parkdir_St_ObstacleLeft = (parkdir_1 when St_ObstacleLeft(ck));
+  parkrighttimer_St_ObstacleLeft =
+    (parkrighttimer_1 when St_ObstacleLeft(ck));
+  parklefttimer_St_ObstacleLeft = (parklefttimer_1 when St_ObstacleLeft(ck));
+  stopCounter_St_ObstacleLeft = (stopCounter_1 when St_ObstacleLeft(ck));
+  objectCounter_St_ObstacleLeft = (objectCounter_1 when St_ObstacleLeft(ck));
+  right_St_ObstacleLeft = (right_1 when St_ObstacleLeft(ck));
+  left_St_ObstacleLeft = (left_1 when St_ObstacleLeft(ck));
+  sum_St_ObstacleLeft = (sum_1 when St_ObstacleLeft(ck));
+  dir_St_ObstacleLeft = (dir_1 when St_ObstacleLeft(ck));
+  pid_value_St_ObstacleLeft = (pid_value_1 when St_ObstacleLeft(ck));
+  d_St_ObstacleLeft = (d_1 when St_ObstacleLeft(ck));
+  i_St_ObstacleLeft = (i_1 when St_ObstacleLeft(ck));
+  p_St_ObstacleLeft = (p_1 when St_ObstacleLeft(ck));
+  error_St_ObstacleLeft = (error_1 when St_ObstacleLeft(ck));
+  uTurn_St_ObstacleLeft = (uTurn_1 when St_ObstacleLeft(ck));
+  rightTurn_St_ObstacleLeft = (rightTurn_1 when St_ObstacleLeft(ck));
+  number_St_ObstacleLeft = (v_267 + (act4 when St_ObstacleLeft(ck)));
+  v_267 = (v_266 + (act3 when St_ObstacleLeft(ck)));
+  v_266 = (v_265 + (act2 when St_ObstacleLeft(ck)));
+  v_265 = ((act0 when St_ObstacleLeft(ck)) + (act1 when St_ObstacleLeft(ck)));
+  direction_St_ObstacleLeft = if v_264 then 0 else 1;
+  v_264 = not((irsenFront when St_ObstacleLeft(ck)));
+  v_r_St_ObstacleLeft = if v_263 then 30 else 40;
+  v_263 = not((irsenFront when St_ObstacleLeft(ck)));
+  v_l_St_ObstacleLeft = if v_262 then 30 else 20;
+  v_262 = not((irsenFront when St_ObstacleLeft(ck)));
+  objectLeftCounter_St_ObstacleLeft = if v_260 then v_261 else 0;
+  v_261 = ((objectLeftCounter_1 when St_ObstacleLeft(ck)) + 1);
+  v_260 = not((irsenFront when St_ObstacleLeft(ck)));
+  act4_St_ObstacleLeft = if v_259 then 1 else 0;
+  v_259 = (v_258 <= (finalavg4_1 when St_ObstacleLeft(ck)));
+  v_258 = (sen when St_ObstacleLeft(ck))[4];
+  act3_St_ObstacleLeft = if v_257 then 1 else 0;
+  v_257 = (v_256 <= (finalavg3_1 when St_ObstacleLeft(ck)));
+  v_256 = (sen when St_ObstacleLeft(ck))[3];
+  act2_St_ObstacleLeft = if v_255 then 1 else 0;
+  v_255 = (v_254 <= (finalavg2_1 when St_ObstacleLeft(ck)));
+  v_254 = (sen when St_ObstacleLeft(ck))[2];
+  act1_St_ObstacleLeft = if v_253 then 1 else 0;
+  v_253 = (v_252 <= (finalavg1_1 when St_ObstacleLeft(ck)));
+  v_252 = (sen when St_ObstacleLeft(ck))[1];
+  act0_St_ObstacleLeft = if v_251 then 1 else 0;
+  v_251 = (v_250 <= (finalavg0_1 when St_ObstacleLeft(ck)));
+  v_250 = (sen when St_ObstacleLeft(ck))[0];
+  nr_St_ObstacleLeft = if v_243 then true else v_249;
+  ns_St_ObstacleLeft = if v_243 then St_ObstacleFinalRight else v_248;
+  v_249 = if v_244 then true else v_247;
+  v_248 = if v_244 then St_ObstacleForward else v_246;
+  v_247 = if v_245 then true else false;
+  v_246 = if v_245 then St_ObstacleRight else St_ObstacleLeft;
+  v_245 = ((objectLeftCounter when St_ObstacleLeft(ck)) > 20);
+  v_244 = not((irsenLeft when St_ObstacleLeft(ck)));
+  v_243 = ((number when St_ObstacleLeft(ck)) >= 1);
+  lastcountwhite_St_ObstacleFinalRight =
+    (lastcountwhite_1 when St_ObstacleFinalRight(ck));
+  whiteavgsen4_St_ObstacleFinalRight =
+    (whiteavgsen4_1 when St_ObstacleFinalRight(ck));
+  whiteavgsen3_St_ObstacleFinalRight =
+    (whiteavgsen3_1 when St_ObstacleFinalRight(ck));
+  whiteavgsen2_St_ObstacleFinalRight =
+    (whiteavgsen2_1 when St_ObstacleFinalRight(ck));
+  whiteavgsen1_St_ObstacleFinalRight =
+    (whiteavgsen1_1 when St_ObstacleFinalRight(ck));
+  whiteavgsen0_St_ObstacleFinalRight =
+    (whiteavgsen0_1 when St_ObstacleFinalRight(ck));
+  finalavg4_St_ObstacleFinalRight =
+    (finalavg4_1 when St_ObstacleFinalRight(ck));
+  finalavg3_St_ObstacleFinalRight =
+    (finalavg3_1 when St_ObstacleFinalRight(ck));
+  finalavg2_St_ObstacleFinalRight =
+    (finalavg2_1 when St_ObstacleFinalRight(ck));
+  finalavg1_St_ObstacleFinalRight =
+    (finalavg1_1 when St_ObstacleFinalRight(ck));
+  finalavg0_St_ObstacleFinalRight =
+    (finalavg0_1 when St_ObstacleFinalRight(ck));
+  rightCounter_St_ObstacleFinalRight =
+    (rightCounter_1 when St_ObstacleFinalRight(ck));
+  navigation_St_ObstacleFinalRight =
+    (navigation_1 when St_ObstacleFinalRight(ck));
+  checkparkhere_St_ObstacleFinalRight =
+    (checkparkhere_1 when St_ObstacleFinalRight(ck));
+  parkingelapse_St_ObstacleFinalRight =
+    (parkingelapse_1 when St_ObstacleFinalRight(ck));
+  parkdir_St_ObstacleFinalRight = (parkdir_1 when St_ObstacleFinalRight(ck));
+  parkrighttimer_St_ObstacleFinalRight =
+    (parkrighttimer_1 when St_ObstacleFinalRight(ck));
+  parklefttimer_St_ObstacleFinalRight =
+    (parklefttimer_1 when St_ObstacleFinalRight(ck));
+  stopCounter_St_ObstacleFinalRight =
+    (stopCounter_1 when St_ObstacleFinalRight(ck));
+  objectLeftCounter_St_ObstacleFinalRight =
+    (objectLeftCounter_1 when St_ObstacleFinalRight(ck));
+  objectCounter_St_ObstacleFinalRight =
+    (objectCounter_1 when St_ObstacleFinalRight(ck));
+  right_St_ObstacleFinalRight = (right_1 when St_ObstacleFinalRight(ck));
+  left_St_ObstacleFinalRight = (left_1 when St_ObstacleFinalRight(ck));
+  sum_St_ObstacleFinalRight = (sum_1 when St_ObstacleFinalRight(ck));
+  dir_St_ObstacleFinalRight = (dir_1 when St_ObstacleFinalRight(ck));
+  pid_value_St_ObstacleFinalRight =
+    (pid_value_1 when St_ObstacleFinalRight(ck));
+  d_St_ObstacleFinalRight = (d_1 when St_ObstacleFinalRight(ck));
+  i_St_ObstacleFinalRight = (i_1 when St_ObstacleFinalRight(ck));
+  p_St_ObstacleFinalRight = (p_1 when St_ObstacleFinalRight(ck));
+  error_St_ObstacleFinalRight = (error_1 when St_ObstacleFinalRight(ck));
+  uTurn_St_ObstacleFinalRight = (uTurn_1 when St_ObstacleFinalRight(ck));
+  rightTurn_St_ObstacleFinalRight =
+    (rightTurn_1 when St_ObstacleFinalRight(ck));
+  number_St_ObstacleFinalRight =
+    (v_242 + (act4 when St_ObstacleFinalRight(ck)));
+  v_242 = (v_241 + (act3 when St_ObstacleFinalRight(ck)));
+  v_241 = (v_240 + (act2 when St_ObstacleFinalRight(ck)));
+  v_240 =
+    ((act0 when St_ObstacleFinalRight(ck)) +
+     (act1 when St_ObstacleFinalRight(ck)));
+  direction_St_ObstacleFinalRight = 0;
+  v_r_St_ObstacleFinalRight = 0;
+  v_l_St_ObstacleFinalRight = 40;
+  act4_St_ObstacleFinalRight = if v_239 then 1 else 0;
+  v_239 = (v_238 <= (finalavg4_1 when St_ObstacleFinalRight(ck)));
+  v_238 = (sen when St_ObstacleFinalRight(ck))[4];
+  act3_St_ObstacleFinalRight = if v_237 then 1 else 0;
+  v_237 = (v_236 <= (finalavg3_1 when St_ObstacleFinalRight(ck)));
+  v_236 = (sen when St_ObstacleFinalRight(ck))[3];
+  act2_St_ObstacleFinalRight = if v_235 then 1 else 0;
+  v_235 = (v_234 <= (finalavg2_1 when St_ObstacleFinalRight(ck)));
+  v_234 = (sen when St_ObstacleFinalRight(ck))[2];
+  act1_St_ObstacleFinalRight = if v_233 then 1 else 0;
+  v_233 = (v_232 <= (finalavg1_1 when St_ObstacleFinalRight(ck)));
+  v_232 = (sen when St_ObstacleFinalRight(ck))[1];
+  act0_St_ObstacleFinalRight = if v_231 then 1 else 0;
+  v_231 = (v_230 <= (finalavg0_1 when St_ObstacleFinalRight(ck)));
+  v_230 = (sen when St_ObstacleFinalRight(ck))[0];
+  nr_St_ObstacleFinalRight = if v_229 then true else false;
+  ns_St_ObstacleFinalRight =
+    if v_229 then St_Blackline else St_ObstacleFinalRight;
+  v_229 = (v_227 or v_228);
+  v_228 = ((act4 when St_ObstacleFinalRight(ck)) = 1);
+  v_227 = ((act0 when St_ObstacleFinalRight(ck)) = 1);
+  lastcountwhite_St_Blackline = (lastcountwhite_1 when St_Blackline(ck));
+  whiteavgsen4_St_Blackline = (whiteavgsen4_1 when St_Blackline(ck));
+  whiteavgsen3_St_Blackline = (whiteavgsen3_1 when St_Blackline(ck));
+  whiteavgsen2_St_Blackline = (whiteavgsen2_1 when St_Blackline(ck));
+  whiteavgsen1_St_Blackline = (whiteavgsen1_1 when St_Blackline(ck));
+  whiteavgsen0_St_Blackline = (whiteavgsen0_1 when St_Blackline(ck));
+  finalavg4_St_Blackline = (finalavg4_1 when St_Blackline(ck));
+  finalavg3_St_Blackline = (finalavg3_1 when St_Blackline(ck));
+  finalavg2_St_Blackline = (finalavg2_1 when St_Blackline(ck));
+  finalavg1_St_Blackline = (finalavg1_1 when St_Blackline(ck));
+  finalavg0_St_Blackline = (finalavg0_1 when St_Blackline(ck));
+  navigation_St_Blackline = (navigation_1 when St_Blackline(ck));
+  checkparkhere_St_Blackline = (checkparkhere_1 when St_Blackline(ck));
+  parkingelapse_St_Blackline = (parkingelapse_1 when St_Blackline(ck));
+  parkdir_St_Blackline = (parkdir_1 when St_Blackline(ck));
+  parkrighttimer_St_Blackline = (parkrighttimer_1 when St_Blackline(ck));
+  parklefttimer_St_Blackline = (parklefttimer_1 when St_Blackline(ck));
+  objectLeftCounter_St_Blackline =
+    (objectLeftCounter_1 when St_Blackline(ck));
+  objectCounter_St_Blackline = if v_225 then v_226 else 0;
+  v_226 = ((objectCounter_1 when St_Blackline(ck)) + 1);
+  v_225 = not((irsenFront when St_Blackline(ck)));
+  uTurn_St_Blackline = if v_224 then true else false;
+  v_224 = (count > 100);
+  count = if v_211 then 0 else v_223;
+  v_223 = if v_220 then v_222 else 0;
+  v_222 = (v_221 + 1);
+  v_221 = pre count;
+  v_220 = (v_218 & v_219);
+  v_219 = ((act4 when St_Blackline(ck)) = 0);
+  v_218 = (v_216 & v_217);
+  v_217 = ((act3 when St_Blackline(ck)) = 0);
+  v_216 = (v_214 & v_215);
+  v_215 = ((act2 when St_Blackline(ck)) = 0);
+  v_214 = (v_212 & v_213);
+  v_213 = ((act1 when St_Blackline(ck)) = 0);
+  v_212 = ((act0 when St_Blackline(ck)) = 0);
+  v_211 = if v_210 then true else (r when St_Blackline(ck));
+  v_210 = true fby false;
+  stopCounter_St_Blackline =
+    if (rightTurn when St_Blackline(ck))
+    then v_209
+    else (stopCounter_1 when St_Blackline(ck));
+  v_209 = ((stopCounter_1 when St_Blackline(ck)) + 1);
+  rightTurn_St_Blackline = if v_208 then true else false;
+  v_208 = ((rightCounter when St_Blackline(ck)) > 10);
+  rightCounter_St_Blackline = if v_206 then v_207 else 0;
+  v_207 = ((rightCounter_1 when St_Blackline(ck)) + 1);
+  v_206 = (v_204 & v_205);
+  v_205 = ((act3 when St_Blackline(ck)) = 1);
+  v_204 = (v_202 & v_203);
+  v_203 = ((act2 when St_Blackline(ck)) = 1);
+  v_202 = ((act1 when St_Blackline(ck)) = 1);
+  direction_St_Blackline = (dir when St_Blackline(ck));
+  v_r_St_Blackline = if v_201 then 0 else (right when St_Blackline(ck));
+  v_201 = ((right when St_Blackline(ck)) < 0);
+  v_l_St_Blackline = if v_200 then 0 else (left when St_Blackline(ck));
+  v_200 = ((left when St_Blackline(ck)) < 0);
+  dir_St_Blackline = 0;
+  right_St_Blackline = (40 - (pid_value when St_Blackline(ck)));
+  left_St_Blackline = (40 + (pid_value when St_Blackline(ck)));
+  pid_value_St_Blackline = (v_199 + (d when St_Blackline(ck)));
+  v_199 = (v_197 + v_198);
+  v_198 = ((i when St_Blackline(ck)) / 1000);
+  v_197 = (3 * (p when St_Blackline(ck)));
+  d_St_Blackline =
+    ((error when St_Blackline(ck)) - (error_1 when St_Blackline(ck)));
+  i_St_Blackline =
+    ((i_1 when St_Blackline(ck)) + (error when St_Blackline(ck)));
+  p_St_Blackline = (error when St_Blackline(ck));
+  error_St_Blackline = (v_195 + v_196);
+  v_196 = (4 * (act4 when St_Blackline(ck)));
+  v_195 = (v_193 + v_194);
+  v_194 = (3 * (act3 when St_Blackline(ck)));
+  v_193 = (v_191 + v_192);
+  v_192 = (0 * (act2 when St_Blackline(ck)));
+  v_191 = (v_189 + v_190);
+  v_190 = (~-(3) * (act1 when St_Blackline(ck)));
+  v_189 = (~-(4) * (act0 when St_Blackline(ck)));
+  number_St_Blackline = (v_188 + (act4 when St_Blackline(ck)));
+  v_188 = (v_187 + (act3 when St_Blackline(ck)));
+  v_187 = (v_186 + (act2 when St_Blackline(ck)));
+  v_186 = ((act0 when St_Blackline(ck)) + (act1 when St_Blackline(ck)));
+  sum_St_Blackline = (v_184 + v_185);
+  v_185 = (sen when St_Blackline(ck))[4];
+  v_184 = (v_182 + v_183);
+  v_183 = (sen when St_Blackline(ck))[3];
+  v_182 = (v_180 + v_181);
+  v_181 = (sen when St_Blackline(ck))[2];
+  v_180 = (v_178 + v_179);
+  v_179 = (sen when St_Blackline(ck))[1];
+  v_178 = (sen when St_Blackline(ck))[0];
+  act4_St_Blackline = if v_177 then 1 else 0;
+  v_177 = (v_176 <= (finalavg4_1 when St_Blackline(ck)));
+  v_176 = (sen when St_Blackline(ck))[4];
+  act3_St_Blackline = if v_175 then 1 else 0;
+  v_175 = (v_174 <= (finalavg3_1 when St_Blackline(ck)));
+  v_174 = (sen when St_Blackline(ck))[3];
+  act2_St_Blackline = if v_173 then 1 else 0;
+  v_173 = (v_172 <= (finalavg2_1 when St_Blackline(ck)));
+  v_172 = (sen when St_Blackline(ck))[2];
+  act1_St_Blackline = if v_171 then 1 else 0;
+  v_171 = (v_170 <= (finalavg1_1 when St_Blackline(ck)));
+  v_170 = (sen when St_Blackline(ck))[1];
+  act0_St_Blackline = if v_169 then 1 else 0;
+  v_169 = (v_168 <= (finalavg0_1 when St_Blackline(ck)));
+  v_168 = (sen when St_Blackline(ck))[0];
+  nr_St_Blackline = if v_160 then true else v_167;
+  ns_St_Blackline = if v_160 then St_ParkingState else v_166;
+  v_167 = if v_161 then true else v_165;
+  v_166 = if v_161 then St_ObstacleRight else v_164;
+  v_165 = if (rightTurn when St_Blackline(ck)) then true else v_163;
+  v_164 = if (rightTurn when St_Blackline(ck)) then St_BlackRight else v_162;
+  v_163 = if (uTurn when St_Blackline(ck)) then true else false;
+  v_162 =
+    if (uTurn when St_Blackline(ck)) then St_BlackUturn else St_Blackline;
+  v_161 = ((objectCounter when St_Blackline(ck)) > 100);
+  v_160 = ((stopCounter when St_Blackline(ck)) = 9);
+  lastcountwhite_St_BlackRight = (lastcountwhite_1 when St_BlackRight(ck));
+  whiteavgsen4_St_BlackRight = (whiteavgsen4_1 when St_BlackRight(ck));
+  whiteavgsen3_St_BlackRight = (whiteavgsen3_1 when St_BlackRight(ck));
+  whiteavgsen2_St_BlackRight = (whiteavgsen2_1 when St_BlackRight(ck));
+  whiteavgsen1_St_BlackRight = (whiteavgsen1_1 when St_BlackRight(ck));
+  whiteavgsen0_St_BlackRight = (whiteavgsen0_1 when St_BlackRight(ck));
+  finalavg4_St_BlackRight = (finalavg4_1 when St_BlackRight(ck));
+  finalavg3_St_BlackRight = (finalavg3_1 when St_BlackRight(ck));
+  finalavg2_St_BlackRight = (finalavg2_1 when St_BlackRight(ck));
+  finalavg1_St_BlackRight = (finalavg1_1 when St_BlackRight(ck));
+  finalavg0_St_BlackRight = (finalavg0_1 when St_BlackRight(ck));
+  rightCounter_St_BlackRight = (rightCounter_1 when St_BlackRight(ck));
+  navigation_St_BlackRight = (navigation_1 when St_BlackRight(ck));
+  checkparkhere_St_BlackRight = (checkparkhere_1 when St_BlackRight(ck));
+  parkingelapse_St_BlackRight = (parkingelapse_1 when St_BlackRight(ck));
+  parkdir_St_BlackRight = (parkdir_1 when St_BlackRight(ck));
+  parkrighttimer_St_BlackRight = (parkrighttimer_1 when St_BlackRight(ck));
+  parklefttimer_St_BlackRight = (parklefttimer_1 when St_BlackRight(ck));
+  stopCounter_St_BlackRight = (stopCounter_1 when St_BlackRight(ck));
+  objectLeftCounter_St_BlackRight =
+    (objectLeftCounter_1 when St_BlackRight(ck));
+  objectCounter_St_BlackRight = (objectCounter_1 when St_BlackRight(ck));
+  right_St_BlackRight = (right_1 when St_BlackRight(ck));
+  left_St_BlackRight = (left_1 when St_BlackRight(ck));
+  sum_St_BlackRight = (sum_1 when St_BlackRight(ck));
+  dir_St_BlackRight = (dir_1 when St_BlackRight(ck));
+  pid_value_St_BlackRight = (pid_value_1 when St_BlackRight(ck));
+  d_St_BlackRight = (d_1 when St_BlackRight(ck));
+  i_St_BlackRight = (i_1 when St_BlackRight(ck));
+  p_St_BlackRight = (p_1 when St_BlackRight(ck));
+  error_St_BlackRight = (error_1 when St_BlackRight(ck));
+  rightTurn_St_BlackRight = (rightTurn_1 when St_BlackRight(ck));
+  uTurn_St_BlackRight = if v_159 then true else false;
+  v_159 = (count_1 > 200);
+  count_1 = if v_146 then 0 else v_158;
+  v_158 = if v_155 then v_157 else 0;
+  v_157 = (v_156 + 1);
+  v_156 = pre count_1;
+  v_155 = (v_153 & v_154);
+  v_154 = ((act4 when St_BlackRight(ck)) = 0);
+  v_153 = (v_151 & v_152);
+  v_152 = ((act3 when St_BlackRight(ck)) = 0);
+  v_151 = (v_149 & v_150);
+  v_150 = ((act2 when St_BlackRight(ck)) = 0);
+  v_149 = (v_147 & v_148);
+  v_148 = ((act1 when St_BlackRight(ck)) = 0);
+  v_147 = ((act0 when St_BlackRight(ck)) = 0);
+  v_146 = if v_145 then true else (r when St_BlackRight(ck));
+  v_145 = true fby false;
+  number_St_BlackRight = (v_144 + (act4 when St_BlackRight(ck)));
+  v_144 = (v_143 + (act3 when St_BlackRight(ck)));
+  v_143 = (v_142 + (act2 when St_BlackRight(ck)));
+  v_142 = ((act0 when St_BlackRight(ck)) + (act1 when St_BlackRight(ck)));
+  direction_St_BlackRight = 0;
+  v_r_St_BlackRight = 0;
+  v_l_St_BlackRight = 50;
+  act4_St_BlackRight = if v_141 then 1 else 0;
+  v_141 = (v_140 <= (finalavg4_1 when St_BlackRight(ck)));
+  v_140 = (sen when St_BlackRight(ck))[4];
+  act3_St_BlackRight = if v_139 then 1 else 0;
+  v_139 = (v_138 <= (finalavg3_1 when St_BlackRight(ck)));
+  v_138 = (sen when St_BlackRight(ck))[3];
+  act2_St_BlackRight = if v_137 then 1 else 0;
+  v_137 = (v_136 <= (finalavg2_1 when St_BlackRight(ck)));
+  v_136 = (sen when St_BlackRight(ck))[2];
+  act1_St_BlackRight = if v_135 then 1 else 0;
+  v_135 = (v_134 <= (finalavg1_1 when St_BlackRight(ck)));
+  v_134 = (sen when St_BlackRight(ck))[1];
+  act0_St_BlackRight = if v_133 then 1 else 0;
+  v_133 = (v_132 <= (finalavg0_1 when St_BlackRight(ck)));
+  v_132 = (sen when St_BlackRight(ck))[0];
+  nr_St_BlackRight = if v_129 then true else v_131;
+  ns_St_BlackRight = if v_129 then St_Blackline else v_130;
+  v_131 = if (uTurn when St_BlackRight(ck)) then true else false;
+  v_130 =
+    if (uTurn when St_BlackRight(ck)) then St_BlackUturn else St_BlackRight;
+  v_129 = (v_127 & v_128);
+  v_128 = ((act2 when St_BlackRight(ck)) = 1);
+  v_127 = ((number when St_BlackRight(ck)) = 1);
+  lastcountwhite_St_BlackUturn = (lastcountwhite_1 when St_BlackUturn(ck));
+  whiteavgsen4_St_BlackUturn = (whiteavgsen4_1 when St_BlackUturn(ck));
+  whiteavgsen3_St_BlackUturn = (whiteavgsen3_1 when St_BlackUturn(ck));
+  whiteavgsen2_St_BlackUturn = (whiteavgsen2_1 when St_BlackUturn(ck));
+  whiteavgsen1_St_BlackUturn = (whiteavgsen1_1 when St_BlackUturn(ck));
+  whiteavgsen0_St_BlackUturn = (whiteavgsen0_1 when St_BlackUturn(ck));
+  finalavg4_St_BlackUturn = (finalavg4_1 when St_BlackUturn(ck));
+  finalavg3_St_BlackUturn = (finalavg3_1 when St_BlackUturn(ck));
+  finalavg2_St_BlackUturn = (finalavg2_1 when St_BlackUturn(ck));
+  finalavg1_St_BlackUturn = (finalavg1_1 when St_BlackUturn(ck));
+  finalavg0_St_BlackUturn = (finalavg0_1 when St_BlackUturn(ck));
+  rightCounter_St_BlackUturn = (rightCounter_1 when St_BlackUturn(ck));
+  navigation_St_BlackUturn = (navigation_1 when St_BlackUturn(ck));
+  checkparkhere_St_BlackUturn = (checkparkhere_1 when St_BlackUturn(ck));
+  parkingelapse_St_BlackUturn = (parkingelapse_1 when St_BlackUturn(ck));
+  parkdir_St_BlackUturn = (parkdir_1 when St_BlackUturn(ck));
+  parkrighttimer_St_BlackUturn = (parkrighttimer_1 when St_BlackUturn(ck));
+  parklefttimer_St_BlackUturn = (parklefttimer_1 when St_BlackUturn(ck));
+  stopCounter_St_BlackUturn = (stopCounter_1 when St_BlackUturn(ck));
+  objectLeftCounter_St_BlackUturn =
+    (objectLeftCounter_1 when St_BlackUturn(ck));
+  objectCounter_St_BlackUturn = (objectCounter_1 when St_BlackUturn(ck));
+  right_St_BlackUturn = (right_1 when St_BlackUturn(ck));
+  left_St_BlackUturn = (left_1 when St_BlackUturn(ck));
+  sum_St_BlackUturn = (sum_1 when St_BlackUturn(ck));
+  dir_St_BlackUturn = (dir_1 when St_BlackUturn(ck));
+  pid_value_St_BlackUturn = (pid_value_1 when St_BlackUturn(ck));
+  d_St_BlackUturn = (d_1 when St_BlackUturn(ck));
+  i_St_BlackUturn = (i_1 when St_BlackUturn(ck));
+  p_St_BlackUturn = (p_1 when St_BlackUturn(ck));
+  error_St_BlackUturn = (error_1 when St_BlackUturn(ck));
+  uTurn_St_BlackUturn = (uTurn_1 when St_BlackUturn(ck));
+  rightTurn_St_BlackUturn = (rightTurn_1 when St_BlackUturn(ck));
+  number_St_BlackUturn = (v_126 + (act4 when St_BlackUturn(ck)));
+  v_126 = (v_125 + (act3 when St_BlackUturn(ck)));
+  v_125 = (v_124 + (act2 when St_BlackUturn(ck)));
+  v_124 = ((act0 when St_BlackUturn(ck)) + (act1 when St_BlackUturn(ck)));
+  direction_St_BlackUturn = 1;
+  v_r_St_BlackUturn = 40;
+  v_l_St_BlackUturn = 40;
+  act4_St_BlackUturn = if v_123 then 1 else 0;
+  v_123 = (v_122 <= (finalavg4_1 when St_BlackUturn(ck)));
+  v_122 = (sen when St_BlackUturn(ck))[4];
+  act3_St_BlackUturn = if v_121 then 1 else 0;
+  v_121 = (v_120 <= (finalavg3_1 when St_BlackUturn(ck)));
+  v_120 = (sen when St_BlackUturn(ck))[3];
+  act2_St_BlackUturn = if v_119 then 1 else 0;
+  v_119 = (v_118 <= (finalavg2_1 when St_BlackUturn(ck)));
+  v_118 = (sen when St_BlackUturn(ck))[2];
+  act1_St_BlackUturn = if v_117 then 1 else 0;
+  v_117 = (v_116 <= (finalavg1_1 when St_BlackUturn(ck)));
+  v_116 = (sen when St_BlackUturn(ck))[1];
+  act0_St_BlackUturn = if v_115 then 1 else 0;
+  v_115 = (v_114 <= (finalavg0_1 when St_BlackUturn(ck)));
+  v_114 = (sen when St_BlackUturn(ck))[0];
+  nr_St_BlackUturn = if v_113 then true else false;
+  ns_St_BlackUturn = if v_113 then St_Blackline else St_BlackUturn;
+  v_113 = ((act2 when St_BlackUturn(ck)) = 1);
+  lastcountwhite_St_ParkingState =
+    (lastcountwhite_1 when St_ParkingState(ck));
+  whiteavgsen4_St_ParkingState = (whiteavgsen4_1 when St_ParkingState(ck));
+  whiteavgsen3_St_ParkingState = (whiteavgsen3_1 when St_ParkingState(ck));
+  whiteavgsen2_St_ParkingState = (whiteavgsen2_1 when St_ParkingState(ck));
+  whiteavgsen1_St_ParkingState = (whiteavgsen1_1 when St_ParkingState(ck));
+  whiteavgsen0_St_ParkingState = (whiteavgsen0_1 when St_ParkingState(ck));
+  finalavg4_St_ParkingState = (finalavg4_1 when St_ParkingState(ck));
+  finalavg3_St_ParkingState = (finalavg3_1 when St_ParkingState(ck));
+  finalavg2_St_ParkingState = (finalavg2_1 when St_ParkingState(ck));
+  finalavg1_St_ParkingState = (finalavg1_1 when St_ParkingState(ck));
+  finalavg0_St_ParkingState = (finalavg0_1 when St_ParkingState(ck));
+  rightCounter_St_ParkingState = (rightCounter_1 when St_ParkingState(ck));
+  parkrighttimer_St_ParkingState =
+    (parkrighttimer_1 when St_ParkingState(ck));
+  parklefttimer_St_ParkingState = (parklefttimer_1 when St_ParkingState(ck));
+  stopCounter_St_ParkingState = (stopCounter_1 when St_ParkingState(ck));
+  objectLeftCounter_St_ParkingState =
+    (objectLeftCounter_1 when St_ParkingState(ck));
+  objectCounter_St_ParkingState = (objectCounter_1 when St_ParkingState(ck));
+  uTurn_St_ParkingState = (uTurn_1 when St_ParkingState(ck));
+  rightTurn_St_ParkingState = (rightTurn_1 when St_ParkingState(ck));
+  v_r_St_ParkingState = if v_110 then 0 else v_112;
+  v_112 = if v_111 then 0 else (right when St_ParkingState(ck));
+  v_111 = ((right when St_ParkingState(ck)) < 0);
+  v_110 = ((navigation when St_ParkingState(ck)) = 4);
+  v_l_St_ParkingState = if v_107 then 0 else v_109;
+  v_109 = if v_108 then 0 else (left when St_ParkingState(ck));
+  v_108 = ((left when St_ParkingState(ck)) < 0);
+  v_107 = ((navigation when St_ParkingState(ck)) = 4);
+  direction_St_ParkingState = (dir when St_ParkingState(ck));
+  parkdir_St_ParkingState = if v_90 then v_106 else 0;
+  v_106 = if v_93 then 0 else v_105;
+  v_105 = if v_96 then 2 else v_104;
+  v_104 = if v_99 then 1 else v_103;
+  v_103 = if v_102 then 1 else 0;
+  v_102 = (v_100 & v_101);
+  v_101 = ((irsenRight when St_ParkingState(ck)) = true);
+  v_100 = ((irsenLeft when St_ParkingState(ck)) = true);
+  v_99 = (v_97 & v_98);
+  v_98 = ((irsenRight when St_ParkingState(ck)) = false);
+  v_97 = ((irsenLeft when St_ParkingState(ck)) = true);
+  v_96 = (v_94 & v_95);
+  v_95 = ((irsenRight when St_ParkingState(ck)) = true);
+  v_94 = ((irsenLeft when St_ParkingState(ck)) = false);
+  v_93 = (v_91 & v_92);
+  v_92 = ((irsenRight when St_ParkingState(ck)) = false);
+  v_91 = ((irsenLeft when St_ParkingState(ck)) = false);
+  v_90 = ((checkparkhere when St_ParkingState(ck)) = 1);
+  checkparkhere_St_ParkingState = if v_83 then 1 else v_89;
+  v_89 = if v_86 then 1 else v_88;
+  v_88 = if v_87 then 1 else 0;
+  v_87 = ((parkingelapse when St_ParkingState(ck)) > 3500);
+  v_86 = (v_84 & v_85);
+  v_85 = ((parkingelapse when St_ParkingState(ck)) < 2550);
+  v_84 = ((parkingelapse when St_ParkingState(ck)) > 2500);
+  v_83 = (v_81 & v_82);
+  v_82 = ((parkingelapse when St_ParkingState(ck)) < 950);
+  v_81 = ((parkingelapse when St_ParkingState(ck)) > 900);
+  navigation_St_ParkingState = if v_70 then 0 else v_80;
+  v_80 = if v_71 then 4 else v_79;
+  v_79 = if v_72 then 0 else v_78;
+  v_78 = if v_73 then 4 else v_77;
+  v_77 = if v_74 then 0 else v_76;
+  v_76 = if v_75 then 4 else 0;
+  v_75 = ((parkingelapse when St_ParkingState(ck)) < 3700);
+  v_74 = ((parkingelapse when St_ParkingState(ck)) < 3400);
+  v_73 = ((parkingelapse when St_ParkingState(ck)) < 2700);
+  v_72 = ((parkingelapse when St_ParkingState(ck)) < 2300);
+  v_71 = ((parkingelapse when St_ParkingState(ck)) < 1200);
+  v_70 = ((parkingelapse when St_ParkingState(ck)) < 800);
+  parkingelapse_St_ParkingState = if v_67 then 1 else v_69;
+  v_69 = (v_68 + 1);
+  v_68 = pre (parkingelapse when St_ParkingState(ck));
+  v_67 = if v_66 then true else (r when St_ParkingState(ck));
+  v_66 = true fby false;
+  dir_St_ParkingState = 0;
+  right_St_ParkingState = (40 - (pid_value when St_ParkingState(ck)));
+  left_St_ParkingState = (40 + (pid_value when St_ParkingState(ck)));
+  pid_value_St_ParkingState = (v_65 + (d when St_ParkingState(ck)));
+  v_65 = (v_63 + v_64);
+  v_64 = ((i when St_ParkingState(ck)) / 1000);
+  v_63 = (3 * (p when St_ParkingState(ck)));
+  d_St_ParkingState =
+    ((error when St_ParkingState(ck)) - (error_1 when St_ParkingState(ck)));
+  i_St_ParkingState =
+    ((i_1 when St_ParkingState(ck)) + (error when St_ParkingState(ck)));
+  p_St_ParkingState = (error when St_ParkingState(ck));
+  error_St_ParkingState = (v_61 + v_62);
+  v_62 = (4 * (act4 when St_ParkingState(ck)));
+  v_61 = (v_59 + v_60);
+  v_60 = (3 * (act3 when St_ParkingState(ck)));
+  v_59 = (v_57 + v_58);
+  v_58 = (0 * (act2 when St_ParkingState(ck)));
+  v_57 = (v_55 + v_56);
+  v_56 = (~-(3) * (act1 when St_ParkingState(ck)));
+  v_55 = (~-(4) * (act0 when St_ParkingState(ck)));
+  number_St_ParkingState = (v_54 + (act4 when St_ParkingState(ck)));
+  v_54 = (v_53 + (act3 when St_ParkingState(ck)));
+  v_53 = (v_52 + (act2 when St_ParkingState(ck)));
+  v_52 = ((act0 when St_ParkingState(ck)) + (act1 when St_ParkingState(ck)));
+  sum_St_ParkingState = (v_50 + v_51);
+  v_51 = (sen when St_ParkingState(ck))[4];
+  v_50 = (v_48 + v_49);
+  v_49 = (sen when St_ParkingState(ck))[3];
+  v_48 = (v_46 + v_47);
+  v_47 = (sen when St_ParkingState(ck))[2];
+  v_46 = (v_44 + v_45);
+  v_45 = (sen when St_ParkingState(ck))[1];
+  v_44 = (sen when St_ParkingState(ck))[0];
+  act4_St_ParkingState = if v_43 then 1 else 0;
+  v_43 = (v_42 <= (finalavg4_1 when St_ParkingState(ck)));
+  v_42 = (sen when St_ParkingState(ck))[4];
+  act3_St_ParkingState = if v_41 then 1 else 0;
+  v_41 = (v_40 <= (finalavg3_1 when St_ParkingState(ck)));
+  v_40 = (sen when St_ParkingState(ck))[3];
+  act2_St_ParkingState = if v_39 then 1 else 0;
+  v_39 = (v_38 <= (finalavg2_1 when St_ParkingState(ck)));
+  v_38 = (sen when St_ParkingState(ck))[2];
+  act1_St_ParkingState = if v_37 then 1 else 0;
+  v_37 = (v_36 <= (finalavg1_1 when St_ParkingState(ck)));
+  v_36 = (sen when St_ParkingState(ck))[1];
+  act0_St_ParkingState = if v_35 then 1 else 0;
+  v_35 = (v_34 <= (finalavg0_1 when St_ParkingState(ck)));
+  v_34 = (sen when St_ParkingState(ck))[0];
+  nr_St_ParkingState = if v_30 then true else v_33;
+  ns_St_ParkingState = if v_30 then St_Parkleft else v_32;
+  v_33 = if v_31 then true else false;
+  v_32 = if v_31 then St_Parkright else St_ParkingState;
+  v_31 = ((parkdir when St_ParkingState(ck)) = 2);
+  v_30 = ((parkdir when St_ParkingState(ck)) = 1);
+  lastcountwhite_St_Parkleft = (lastcountwhite_1 when St_Parkleft(ck));
+  whiteavgsen4_St_Parkleft = (whiteavgsen4_1 when St_Parkleft(ck));
+  whiteavgsen3_St_Parkleft = (whiteavgsen3_1 when St_Parkleft(ck));
+  whiteavgsen2_St_Parkleft = (whiteavgsen2_1 when St_Parkleft(ck));
+  whiteavgsen1_St_Parkleft = (whiteavgsen1_1 when St_Parkleft(ck));
+  whiteavgsen0_St_Parkleft = (whiteavgsen0_1 when St_Parkleft(ck));
+  finalavg4_St_Parkleft = (finalavg4_1 when St_Parkleft(ck));
+  finalavg3_St_Parkleft = (finalavg3_1 when St_Parkleft(ck));
+  finalavg2_St_Parkleft = (finalavg2_1 when St_Parkleft(ck));
+  finalavg1_St_Parkleft = (finalavg1_1 when St_Parkleft(ck));
+  finalavg0_St_Parkleft = (finalavg0_1 when St_Parkleft(ck));
+  rightCounter_St_Parkleft = (rightCounter_1 when St_Parkleft(ck));
+  navigation_St_Parkleft = (navigation_1 when St_Parkleft(ck));
+  checkparkhere_St_Parkleft = (checkparkhere_1 when St_Parkleft(ck));
+  parkingelapse_St_Parkleft = (parkingelapse_1 when St_Parkleft(ck));
+  parkdir_St_Parkleft = (parkdir_1 when St_Parkleft(ck));
+  parkrighttimer_St_Parkleft = (parkrighttimer_1 when St_Parkleft(ck));
+  stopCounter_St_Parkleft = (stopCounter_1 when St_Parkleft(ck));
+  objectLeftCounter_St_Parkleft = (objectLeftCounter_1 when St_Parkleft(ck));
+  objectCounter_St_Parkleft = (objectCounter_1 when St_Parkleft(ck));
+  right_St_Parkleft = (right_1 when St_Parkleft(ck));
+  left_St_Parkleft = (left_1 when St_Parkleft(ck));
+  sum_St_Parkleft = (sum_1 when St_Parkleft(ck));
+  act4_St_Parkleft = (act4_1 when St_Parkleft(ck));
+  act3_St_Parkleft = (act3_1 when St_Parkleft(ck));
+  act2_St_Parkleft = (act2_1 when St_Parkleft(ck));
+  act1_St_Parkleft = (act1_1 when St_Parkleft(ck));
+  act0_St_Parkleft = (act0_1 when St_Parkleft(ck));
+  dir_St_Parkleft = (dir_1 when St_Parkleft(ck));
+  number_St_Parkleft = (number_1 when St_Parkleft(ck));
+  pid_value_St_Parkleft = (pid_value_1 when St_Parkleft(ck));
+  d_St_Parkleft = (d_1 when St_Parkleft(ck));
+  i_St_Parkleft = (i_1 when St_Parkleft(ck));
+  p_St_Parkleft = (p_1 when St_Parkleft(ck));
+  error_St_Parkleft = (error_1 when St_Parkleft(ck));
+  uTurn_St_Parkleft = (uTurn_1 when St_Parkleft(ck));
+  rightTurn_St_Parkleft = (rightTurn_1 when St_Parkleft(ck));
+  direction_St_Parkleft = if v_29 then 0 else 3;
+  v_29 = ((parklefttimer when St_Parkleft(ck)) < 500);
+  v_r_St_Parkleft = if v_26 then 40 else v_28;
+  v_28 = if v_27 then 45 else 40;
+  v_27 = ((parklefttimer when St_Parkleft(ck)) < 1700);
+  v_26 = ((parklefttimer when St_Parkleft(ck)) < 500);
+  v_l_St_Parkleft = if v_23 then 40 else v_25;
+  v_25 = if v_24 then 25 else 40;
+  v_24 = ((parklefttimer when St_Parkleft(ck)) < 1700);
+  v_23 = ((parklefttimer when St_Parkleft(ck)) < 500);
+  parklefttimer_St_Parkleft = if v_17 then 1 else v_22;
+  v_22 = if v_19 then 1 else v_21;
+  v_21 = (v_20 + 1);
+  v_20 = pre (parklefttimer when St_Parkleft(ck));
+  v_19 = (v_18 = 1801);
+  v_18 = pre (parklefttimer when St_Parkleft(ck));
+  v_17 = if v_16 then true else (r when St_Parkleft(ck));
+  v_16 = true fby false;
+  nr_St_Parkleft = if v_15 then true else false;
+  ns_St_Parkleft = if v_15 then St_Stopstate else St_Parkleft;
+  v_15 = ((parklefttimer when St_Parkleft(ck)) = 1800);
+  lastcountwhite_St_Parkright = (lastcountwhite_1 when St_Parkright(ck));
+  whiteavgsen4_St_Parkright = (whiteavgsen4_1 when St_Parkright(ck));
+  whiteavgsen3_St_Parkright = (whiteavgsen3_1 when St_Parkright(ck));
+  whiteavgsen2_St_Parkright = (whiteavgsen2_1 when St_Parkright(ck));
+  whiteavgsen1_St_Parkright = (whiteavgsen1_1 when St_Parkright(ck));
+  whiteavgsen0_St_Parkright = (whiteavgsen0_1 when St_Parkright(ck));
+  finalavg4_St_Parkright = (finalavg4_1 when St_Parkright(ck));
+  finalavg3_St_Parkright = (finalavg3_1 when St_Parkright(ck));
+  finalavg2_St_Parkright = (finalavg2_1 when St_Parkright(ck));
+  finalavg1_St_Parkright = (finalavg1_1 when St_Parkright(ck));
+  finalavg0_St_Parkright = (finalavg0_1 when St_Parkright(ck));
+  rightCounter_St_Parkright = (rightCounter_1 when St_Parkright(ck));
+  navigation_St_Parkright = (navigation_1 when St_Parkright(ck));
+  checkparkhere_St_Parkright = (checkparkhere_1 when St_Parkright(ck));
+  parkingelapse_St_Parkright = (parkingelapse_1 when St_Parkright(ck));
+  parkdir_St_Parkright = (parkdir_1 when St_Parkright(ck));
+  parklefttimer_St_Parkright = (parklefttimer_1 when St_Parkright(ck));
+  stopCounter_St_Parkright = (stopCounter_1 when St_Parkright(ck));
+  objectLeftCounter_St_Parkright =
+    (objectLeftCounter_1 when St_Parkright(ck));
+  objectCounter_St_Parkright = (objectCounter_1 when St_Parkright(ck));
+  right_St_Parkright = (right_1 when St_Parkright(ck));
+  left_St_Parkright = (left_1 when St_Parkright(ck));
+  sum_St_Parkright = (sum_1 when St_Parkright(ck));
+  act4_St_Parkright = (act4_1 when St_Parkright(ck));
+  act3_St_Parkright = (act3_1 when St_Parkright(ck));
+  act2_St_Parkright = (act2_1 when St_Parkright(ck));
+  act1_St_Parkright = (act1_1 when St_Parkright(ck));
+  act0_St_Parkright = (act0_1 when St_Parkright(ck));
+  dir_St_Parkright = (dir_1 when St_Parkright(ck));
+  number_St_Parkright = (number_1 when St_Parkright(ck));
+  pid_value_St_Parkright = (pid_value_1 when St_Parkright(ck));
+  d_St_Parkright = (d_1 when St_Parkright(ck));
+  i_St_Parkright = (i_1 when St_Parkright(ck));
+  p_St_Parkright = (p_1 when St_Parkright(ck));
+  error_St_Parkright = (error_1 when St_Parkright(ck));
+  uTurn_St_Parkright = (uTurn_1 when St_Parkright(ck));
+  rightTurn_St_Parkright = (rightTurn_1 when St_Parkright(ck));
+  direction_St_Parkright = if v_14 then 0 else 3;
+  v_14 = ((parkrighttimer when St_Parkright(ck)) < 500);
+  v_r_St_Parkright = if v_11 then 40 else v_13;
+  v_13 = if v_12 then 25 else 40;
+  v_12 = ((parkrighttimer when St_Parkright(ck)) < 1700);
+  v_11 = ((parkrighttimer when St_Parkright(ck)) < 500);
+  v_l_St_Parkright = if v_8 then 40 else v_10;
+  v_10 = if v_9 then 45 else 40;
+  v_9 = ((parkrighttimer when St_Parkright(ck)) < 1700);
+  v_8 = ((parkrighttimer when St_Parkright(ck)) < 500);
+  parkrighttimer_St_Parkright = if v_2 then 1 else v_7;
+  v_7 = if v_4 then 2 else v_6;
+  v_6 = (v_5 + 1);
+  v_5 = pre (parkrighttimer when St_Parkright(ck));
+  v_4 = (v_3 = 1801);
+  v_3 = pre (parkrighttimer when St_Parkright(ck));
+  v_2 = if v_1 then true else (r when St_Parkright(ck));
+  v_1 = true fby false;
+  nr_St_Parkright = if v then true else false;
+  ns_St_Parkright = if v then St_Stopstate else St_Parkright;
+  v = ((parkrighttimer when St_Parkright(ck)) = 1800);
+  lastcountwhite_St_Stopstate = (lastcountwhite_1 when St_Stopstate(ck));
+  whiteavgsen4_St_Stopstate = (whiteavgsen4_1 when St_Stopstate(ck));
+  whiteavgsen3_St_Stopstate = (whiteavgsen3_1 when St_Stopstate(ck));
+  whiteavgsen2_St_Stopstate = (whiteavgsen2_1 when St_Stopstate(ck));
+  whiteavgsen1_St_Stopstate = (whiteavgsen1_1 when St_Stopstate(ck));
+  whiteavgsen0_St_Stopstate = (whiteavgsen0_1 when St_Stopstate(ck));
+  finalavg4_St_Stopstate = (finalavg4_1 when St_Stopstate(ck));
+  finalavg3_St_Stopstate = (finalavg3_1 when St_Stopstate(ck));
+  finalavg2_St_Stopstate = (finalavg2_1 when St_Stopstate(ck));
+  finalavg1_St_Stopstate = (finalavg1_1 when St_Stopstate(ck));
+  finalavg0_St_Stopstate = (finalavg0_1 when St_Stopstate(ck));
+  rightCounter_St_Stopstate = (rightCounter_1 when St_Stopstate(ck));
+  navigation_St_Stopstate = (navigation_1 when St_Stopstate(ck));
+  checkparkhere_St_Stopstate = (checkparkhere_1 when St_Stopstate(ck));
+  parkingelapse_St_Stopstate = (parkingelapse_1 when St_Stopstate(ck));
+  parkdir_St_Stopstate = (parkdir_1 when St_Stopstate(ck));
+  parkrighttimer_St_Stopstate = (parkrighttimer_1 when St_Stopstate(ck));
+  parklefttimer_St_Stopstate = (parklefttimer_1 when St_Stopstate(ck));
+  stopCounter_St_Stopstate = (stopCounter_1 when St_Stopstate(ck));
+  objectLeftCounter_St_Stopstate =
+    (objectLeftCounter_1 when St_Stopstate(ck));
+  objectCounter_St_Stopstate = (objectCounter_1 when St_Stopstate(ck));
+  right_St_Stopstate = (right_1 when St_Stopstate(ck));
+  left_St_Stopstate = (left_1 when St_Stopstate(ck));
+  sum_St_Stopstate = (sum_1 when St_Stopstate(ck));
+  act4_St_Stopstate = (act4_1 when St_Stopstate(ck));
+  act3_St_Stopstate = (act3_1 when St_Stopstate(ck));
+  act2_St_Stopstate = (act2_1 when St_Stopstate(ck));
+  act1_St_Stopstate = (act1_1 when St_Stopstate(ck));
+  act0_St_Stopstate = (act0_1 when St_Stopstate(ck));
+  dir_St_Stopstate = (dir_1 when St_Stopstate(ck));
+  number_St_Stopstate = (number_1 when St_Stopstate(ck));
+  pid_value_St_Stopstate = (pid_value_1 when St_Stopstate(ck));
+  d_St_Stopstate = (d_1 when St_Stopstate(ck));
+  i_St_Stopstate = (i_1 when St_Stopstate(ck));
+  p_St_Stopstate = (p_1 when St_Stopstate(ck));
+  error_St_Stopstate = (error_1 when St_Stopstate(ck));
+  uTurn_St_Stopstate = (uTurn_1 when St_Stopstate(ck));
+  rightTurn_St_Stopstate = (rightTurn_1 when St_Stopstate(ck));
+  direction_St_Stopstate = 100;
+  v_r_St_Stopstate = 0;
+  v_l_St_Stopstate = 0;
+  nr_St_Stopstate = if true then true else false;
+  ns_St_Stopstate = if true then St_Stopstate else St_Stopstate;
+  v_l =
+    merge ck
+      (St_Stopstate -> v_l_St_Stopstate)(St_Parkright -> v_l_St_Parkright)
+      (St_Parkleft -> v_l_St_Parkleft)
+      (St_ParkingState -> v_l_St_ParkingState)
+      (St_BlackUturn -> v_l_St_BlackUturn)
+      (St_BlackRight -> v_l_St_BlackRight)(St_Blackline -> v_l_St_Blackline)
+      (St_ObstacleFinalRight -> v_l_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> v_l_St_ObstacleLeft)
+      (St_ObstacleForward -> v_l_St_ObstacleForward)
+      (St_ObstacleRight -> v_l_St_ObstacleRight)
+      (St_LineSwitch -> v_l_St_LineSwitch)(St_Whiteline -> v_l_St_Whiteline)
+      (St_WhitelineFollower -> v_l_St_WhitelineFollower);
+  v_r =
+    merge ck
+      (St_Stopstate -> v_r_St_Stopstate)(St_Parkright -> v_r_St_Parkright)
+      (St_Parkleft -> v_r_St_Parkleft)
+      (St_ParkingState -> v_r_St_ParkingState)
+      (St_BlackUturn -> v_r_St_BlackUturn)
+      (St_BlackRight -> v_r_St_BlackRight)(St_Blackline -> v_r_St_Blackline)
+      (St_ObstacleFinalRight -> v_r_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> v_r_St_ObstacleLeft)
+      (St_ObstacleForward -> v_r_St_ObstacleForward)
+      (St_ObstacleRight -> v_r_St_ObstacleRight)
+      (St_LineSwitch -> v_r_St_LineSwitch)(St_Whiteline -> v_r_St_Whiteline)
+      (St_WhitelineFollower -> v_r_St_WhitelineFollower);
+  direction =
+    merge ck
+      (St_Stopstate -> direction_St_Stopstate)
+      (St_Parkright -> direction_St_Parkright)
+      (St_Parkleft -> direction_St_Parkleft)
+      (St_ParkingState -> direction_St_ParkingState)
+      (St_BlackUturn -> direction_St_BlackUturn)
+      (St_BlackRight -> direction_St_BlackRight)
+      (St_Blackline -> direction_St_Blackline)
+      (St_ObstacleFinalRight -> direction_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> direction_St_ObstacleLeft)
+      (St_ObstacleForward -> direction_St_ObstacleForward)
+      (St_ObstacleRight -> direction_St_ObstacleRight)
+      (St_LineSwitch -> direction_St_LineSwitch)
+      (St_Whiteline -> direction_St_Whiteline)
+      (St_WhitelineFollower -> direction_St_WhitelineFollower);
+  rightTurn =
+    merge ck
+      (St_Stopstate -> rightTurn_St_Stopstate)
+      (St_Parkright -> rightTurn_St_Parkright)
+      (St_Parkleft -> rightTurn_St_Parkleft)
+      (St_ParkingState -> rightTurn_St_ParkingState)
+      (St_BlackUturn -> rightTurn_St_BlackUturn)
+      (St_BlackRight -> rightTurn_St_BlackRight)
+      (St_Blackline -> rightTurn_St_Blackline)
+      (St_ObstacleFinalRight -> rightTurn_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> rightTurn_St_ObstacleLeft)
+      (St_ObstacleForward -> rightTurn_St_ObstacleForward)
+      (St_ObstacleRight -> rightTurn_St_ObstacleRight)
+      (St_LineSwitch -> rightTurn_St_LineSwitch)
+      (St_Whiteline -> rightTurn_St_Whiteline)
+      (St_WhitelineFollower -> rightTurn_St_WhitelineFollower);
+  uTurn =
+    merge ck
+      (St_Stopstate -> uTurn_St_Stopstate)
+      (St_Parkright -> uTurn_St_Parkright)(St_Parkleft -> uTurn_St_Parkleft)
+      (St_ParkingState -> uTurn_St_ParkingState)
+      (St_BlackUturn -> uTurn_St_BlackUturn)
+      (St_BlackRight -> uTurn_St_BlackRight)
+      (St_Blackline -> uTurn_St_Blackline)
+      (St_ObstacleFinalRight -> uTurn_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> uTurn_St_ObstacleLeft)
+      (St_ObstacleForward -> uTurn_St_ObstacleForward)
+      (St_ObstacleRight -> uTurn_St_ObstacleRight)
+      (St_LineSwitch -> uTurn_St_LineSwitch)
+      (St_Whiteline -> uTurn_St_Whiteline)
+      (St_WhitelineFollower -> uTurn_St_WhitelineFollower);
+  error =
+    merge ck
+      (St_Stopstate -> error_St_Stopstate)
+      (St_Parkright -> error_St_Parkright)(St_Parkleft -> error_St_Parkleft)
+      (St_ParkingState -> error_St_ParkingState)
+      (St_BlackUturn -> error_St_BlackUturn)
+      (St_BlackRight -> error_St_BlackRight)
+      (St_Blackline -> error_St_Blackline)
+      (St_ObstacleFinalRight -> error_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> error_St_ObstacleLeft)
+      (St_ObstacleForward -> error_St_ObstacleForward)
+      (St_ObstacleRight -> error_St_ObstacleRight)
+      (St_LineSwitch -> error_St_LineSwitch)
+      (St_Whiteline -> error_St_Whiteline)
+      (St_WhitelineFollower -> error_St_WhitelineFollower);
+  p =
+    merge ck
+      (St_Stopstate -> p_St_Stopstate)(St_Parkright -> p_St_Parkright)
+      (St_Parkleft -> p_St_Parkleft)(St_ParkingState -> p_St_ParkingState)
+      (St_BlackUturn -> p_St_BlackUturn)(St_BlackRight -> p_St_BlackRight)
+      (St_Blackline -> p_St_Blackline)
+      (St_ObstacleFinalRight -> p_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> p_St_ObstacleLeft)
+      (St_ObstacleForward -> p_St_ObstacleForward)
+      (St_ObstacleRight -> p_St_ObstacleRight)
+      (St_LineSwitch -> p_St_LineSwitch)(St_Whiteline -> p_St_Whiteline)
+      (St_WhitelineFollower -> p_St_WhitelineFollower);
+  i =
+    merge ck
+      (St_Stopstate -> i_St_Stopstate)(St_Parkright -> i_St_Parkright)
+      (St_Parkleft -> i_St_Parkleft)(St_ParkingState -> i_St_ParkingState)
+      (St_BlackUturn -> i_St_BlackUturn)(St_BlackRight -> i_St_BlackRight)
+      (St_Blackline -> i_St_Blackline)
+      (St_ObstacleFinalRight -> i_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> i_St_ObstacleLeft)
+      (St_ObstacleForward -> i_St_ObstacleForward)
+      (St_ObstacleRight -> i_St_ObstacleRight)
+      (St_LineSwitch -> i_St_LineSwitch)(St_Whiteline -> i_St_Whiteline)
+      (St_WhitelineFollower -> i_St_WhitelineFollower);
+  d =
+    merge ck
+      (St_Stopstate -> d_St_Stopstate)(St_Parkright -> d_St_Parkright)
+      (St_Parkleft -> d_St_Parkleft)(St_ParkingState -> d_St_ParkingState)
+      (St_BlackUturn -> d_St_BlackUturn)(St_BlackRight -> d_St_BlackRight)
+      (St_Blackline -> d_St_Blackline)
+      (St_ObstacleFinalRight -> d_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> d_St_ObstacleLeft)
+      (St_ObstacleForward -> d_St_ObstacleForward)
+      (St_ObstacleRight -> d_St_ObstacleRight)
+      (St_LineSwitch -> d_St_LineSwitch)(St_Whiteline -> d_St_Whiteline)
+      (St_WhitelineFollower -> d_St_WhitelineFollower);
+  pid_value =
+    merge ck
+      (St_Stopstate -> pid_value_St_Stopstate)
+      (St_Parkright -> pid_value_St_Parkright)
+      (St_Parkleft -> pid_value_St_Parkleft)
+      (St_ParkingState -> pid_value_St_ParkingState)
+      (St_BlackUturn -> pid_value_St_BlackUturn)
+      (St_BlackRight -> pid_value_St_BlackRight)
+      (St_Blackline -> pid_value_St_Blackline)
+      (St_ObstacleFinalRight -> pid_value_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> pid_value_St_ObstacleLeft)
+      (St_ObstacleForward -> pid_value_St_ObstacleForward)
+      (St_ObstacleRight -> pid_value_St_ObstacleRight)
+      (St_LineSwitch -> pid_value_St_LineSwitch)
+      (St_Whiteline -> pid_value_St_Whiteline)
+      (St_WhitelineFollower -> pid_value_St_WhitelineFollower);
+  number =
+    merge ck
+      (St_Stopstate -> number_St_Stopstate)
+      (St_Parkright -> number_St_Parkright)
+      (St_Parkleft -> number_St_Parkleft)
+      (St_ParkingState -> number_St_ParkingState)
+      (St_BlackUturn -> number_St_BlackUturn)
+      (St_BlackRight -> number_St_BlackRight)
+      (St_Blackline -> number_St_Blackline)
+      (St_ObstacleFinalRight -> number_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> number_St_ObstacleLeft)
+      (St_ObstacleForward -> number_St_ObstacleForward)
+      (St_ObstacleRight -> number_St_ObstacleRight)
+      (St_LineSwitch -> number_St_LineSwitch)
+      (St_Whiteline -> number_St_Whiteline)
+      (St_WhitelineFollower -> number_St_WhitelineFollower);
+  dir =
+    merge ck
+      (St_Stopstate -> dir_St_Stopstate)(St_Parkright -> dir_St_Parkright)
+      (St_Parkleft -> dir_St_Parkleft)
+      (St_ParkingState -> dir_St_ParkingState)
+      (St_BlackUturn -> dir_St_BlackUturn)
+      (St_BlackRight -> dir_St_BlackRight)(St_Blackline -> dir_St_Blackline)
+      (St_ObstacleFinalRight -> dir_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> dir_St_ObstacleLeft)
+      (St_ObstacleForward -> dir_St_ObstacleForward)
+      (St_ObstacleRight -> dir_St_ObstacleRight)
+      (St_LineSwitch -> dir_St_LineSwitch)(St_Whiteline -> dir_St_Whiteline)
+      (St_WhitelineFollower -> dir_St_WhitelineFollower);
+  act0 =
+    merge ck
+      (St_Stopstate -> act0_St_Stopstate)(St_Parkright -> act0_St_Parkright)
+      (St_Parkleft -> act0_St_Parkleft)
+      (St_ParkingState -> act0_St_ParkingState)
+      (St_BlackUturn -> act0_St_BlackUturn)
+      (St_BlackRight -> act0_St_BlackRight)
+      (St_Blackline -> act0_St_Blackline)
+      (St_ObstacleFinalRight -> act0_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> act0_St_ObstacleLeft)
+      (St_ObstacleForward -> act0_St_ObstacleForward)
+      (St_ObstacleRight -> act0_St_ObstacleRight)
+      (St_LineSwitch -> act0_St_LineSwitch)
+      (St_Whiteline -> act0_St_Whiteline)
+      (St_WhitelineFollower -> act0_St_WhitelineFollower);
+  act1 =
+    merge ck
+      (St_Stopstate -> act1_St_Stopstate)(St_Parkright -> act1_St_Parkright)
+      (St_Parkleft -> act1_St_Parkleft)
+      (St_ParkingState -> act1_St_ParkingState)
+      (St_BlackUturn -> act1_St_BlackUturn)
+      (St_BlackRight -> act1_St_BlackRight)
+      (St_Blackline -> act1_St_Blackline)
+      (St_ObstacleFinalRight -> act1_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> act1_St_ObstacleLeft)
+      (St_ObstacleForward -> act1_St_ObstacleForward)
+      (St_ObstacleRight -> act1_St_ObstacleRight)
+      (St_LineSwitch -> act1_St_LineSwitch)
+      (St_Whiteline -> act1_St_Whiteline)
+      (St_WhitelineFollower -> act1_St_WhitelineFollower);
+  act2 =
+    merge ck
+      (St_Stopstate -> act2_St_Stopstate)(St_Parkright -> act2_St_Parkright)
+      (St_Parkleft -> act2_St_Parkleft)
+      (St_ParkingState -> act2_St_ParkingState)
+      (St_BlackUturn -> act2_St_BlackUturn)
+      (St_BlackRight -> act2_St_BlackRight)
+      (St_Blackline -> act2_St_Blackline)
+      (St_ObstacleFinalRight -> act2_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> act2_St_ObstacleLeft)
+      (St_ObstacleForward -> act2_St_ObstacleForward)
+      (St_ObstacleRight -> act2_St_ObstacleRight)
+      (St_LineSwitch -> act2_St_LineSwitch)
+      (St_Whiteline -> act2_St_Whiteline)
+      (St_WhitelineFollower -> act2_St_WhitelineFollower);
+  act3 =
+    merge ck
+      (St_Stopstate -> act3_St_Stopstate)(St_Parkright -> act3_St_Parkright)
+      (St_Parkleft -> act3_St_Parkleft)
+      (St_ParkingState -> act3_St_ParkingState)
+      (St_BlackUturn -> act3_St_BlackUturn)
+      (St_BlackRight -> act3_St_BlackRight)
+      (St_Blackline -> act3_St_Blackline)
+      (St_ObstacleFinalRight -> act3_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> act3_St_ObstacleLeft)
+      (St_ObstacleForward -> act3_St_ObstacleForward)
+      (St_ObstacleRight -> act3_St_ObstacleRight)
+      (St_LineSwitch -> act3_St_LineSwitch)
+      (St_Whiteline -> act3_St_Whiteline)
+      (St_WhitelineFollower -> act3_St_WhitelineFollower);
+  act4 =
+    merge ck
+      (St_Stopstate -> act4_St_Stopstate)(St_Parkright -> act4_St_Parkright)
+      (St_Parkleft -> act4_St_Parkleft)
+      (St_ParkingState -> act4_St_ParkingState)
+      (St_BlackUturn -> act4_St_BlackUturn)
+      (St_BlackRight -> act4_St_BlackRight)
+      (St_Blackline -> act4_St_Blackline)
+      (St_ObstacleFinalRight -> act4_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> act4_St_ObstacleLeft)
+      (St_ObstacleForward -> act4_St_ObstacleForward)
+      (St_ObstacleRight -> act4_St_ObstacleRight)
+      (St_LineSwitch -> act4_St_LineSwitch)
+      (St_Whiteline -> act4_St_Whiteline)
+      (St_WhitelineFollower -> act4_St_WhitelineFollower);
+  sum =
+    merge ck
+      (St_Stopstate -> sum_St_Stopstate)(St_Parkright -> sum_St_Parkright)
+      (St_Parkleft -> sum_St_Parkleft)
+      (St_ParkingState -> sum_St_ParkingState)
+      (St_BlackUturn -> sum_St_BlackUturn)
+      (St_BlackRight -> sum_St_BlackRight)(St_Blackline -> sum_St_Blackline)
+      (St_ObstacleFinalRight -> sum_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> sum_St_ObstacleLeft)
+      (St_ObstacleForward -> sum_St_ObstacleForward)
+      (St_ObstacleRight -> sum_St_ObstacleRight)
+      (St_LineSwitch -> sum_St_LineSwitch)(St_Whiteline -> sum_St_Whiteline)
+      (St_WhitelineFollower -> sum_St_WhitelineFollower);
+  left =
+    merge ck
+      (St_Stopstate -> left_St_Stopstate)(St_Parkright -> left_St_Parkright)
+      (St_Parkleft -> left_St_Parkleft)
+      (St_ParkingState -> left_St_ParkingState)
+      (St_BlackUturn -> left_St_BlackUturn)
+      (St_BlackRight -> left_St_BlackRight)
+      (St_Blackline -> left_St_Blackline)
+      (St_ObstacleFinalRight -> left_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> left_St_ObstacleLeft)
+      (St_ObstacleForward -> left_St_ObstacleForward)
+      (St_ObstacleRight -> left_St_ObstacleRight)
+      (St_LineSwitch -> left_St_LineSwitch)
+      (St_Whiteline -> left_St_Whiteline)
+      (St_WhitelineFollower -> left_St_WhitelineFollower);
+  right =
+    merge ck
+      (St_Stopstate -> right_St_Stopstate)
+      (St_Parkright -> right_St_Parkright)(St_Parkleft -> right_St_Parkleft)
+      (St_ParkingState -> right_St_ParkingState)
+      (St_BlackUturn -> right_St_BlackUturn)
+      (St_BlackRight -> right_St_BlackRight)
+      (St_Blackline -> right_St_Blackline)
+      (St_ObstacleFinalRight -> right_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> right_St_ObstacleLeft)
+      (St_ObstacleForward -> right_St_ObstacleForward)
+      (St_ObstacleRight -> right_St_ObstacleRight)
+      (St_LineSwitch -> right_St_LineSwitch)
+      (St_Whiteline -> right_St_Whiteline)
+      (St_WhitelineFollower -> right_St_WhitelineFollower);
+  objectCounter =
+    merge ck
+      (St_Stopstate -> objectCounter_St_Stopstate)
+      (St_Parkright -> objectCounter_St_Parkright)
+      (St_Parkleft -> objectCounter_St_Parkleft)
+      (St_ParkingState -> objectCounter_St_ParkingState)
+      (St_BlackUturn -> objectCounter_St_BlackUturn)
+      (St_BlackRight -> objectCounter_St_BlackRight)
+      (St_Blackline -> objectCounter_St_Blackline)
+      (St_ObstacleFinalRight -> objectCounter_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> objectCounter_St_ObstacleLeft)
+      (St_ObstacleForward -> objectCounter_St_ObstacleForward)
+      (St_ObstacleRight -> objectCounter_St_ObstacleRight)
+      (St_LineSwitch -> objectCounter_St_LineSwitch)
+      (St_Whiteline -> objectCounter_St_Whiteline)
+      (St_WhitelineFollower -> objectCounter_St_WhitelineFollower);
+  objectLeftCounter =
+    merge ck
+      (St_Stopstate -> objectLeftCounter_St_Stopstate)
+      (St_Parkright -> objectLeftCounter_St_Parkright)
+      (St_Parkleft -> objectLeftCounter_St_Parkleft)
+      (St_ParkingState -> objectLeftCounter_St_ParkingState)
+      (St_BlackUturn -> objectLeftCounter_St_BlackUturn)
+      (St_BlackRight -> objectLeftCounter_St_BlackRight)
+      (St_Blackline -> objectLeftCounter_St_Blackline)
+      (St_ObstacleFinalRight -> objectLeftCounter_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> objectLeftCounter_St_ObstacleLeft)
+      (St_ObstacleForward -> objectLeftCounter_St_ObstacleForward)
+      (St_ObstacleRight -> objectLeftCounter_St_ObstacleRight)
+      (St_LineSwitch -> objectLeftCounter_St_LineSwitch)
+      (St_Whiteline -> objectLeftCounter_St_Whiteline)
+      (St_WhitelineFollower -> objectLeftCounter_St_WhitelineFollower);
+  stopCounter =
+    merge ck
+      (St_Stopstate -> stopCounter_St_Stopstate)
+      (St_Parkright -> stopCounter_St_Parkright)
+      (St_Parkleft -> stopCounter_St_Parkleft)
+      (St_ParkingState -> stopCounter_St_ParkingState)
+      (St_BlackUturn -> stopCounter_St_BlackUturn)
+      (St_BlackRight -> stopCounter_St_BlackRight)
+      (St_Blackline -> stopCounter_St_Blackline)
+      (St_ObstacleFinalRight -> stopCounter_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> stopCounter_St_ObstacleLeft)
+      (St_ObstacleForward -> stopCounter_St_ObstacleForward)
+      (St_ObstacleRight -> stopCounter_St_ObstacleRight)
+      (St_LineSwitch -> stopCounter_St_LineSwitch)
+      (St_Whiteline -> stopCounter_St_Whiteline)
+      (St_WhitelineFollower -> stopCounter_St_WhitelineFollower);
+  parklefttimer =
+    merge ck
+      (St_Stopstate -> parklefttimer_St_Stopstate)
+      (St_Parkright -> parklefttimer_St_Parkright)
+      (St_Parkleft -> parklefttimer_St_Parkleft)
+      (St_ParkingState -> parklefttimer_St_ParkingState)
+      (St_BlackUturn -> parklefttimer_St_BlackUturn)
+      (St_BlackRight -> parklefttimer_St_BlackRight)
+      (St_Blackline -> parklefttimer_St_Blackline)
+      (St_ObstacleFinalRight -> parklefttimer_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> parklefttimer_St_ObstacleLeft)
+      (St_ObstacleForward -> parklefttimer_St_ObstacleForward)
+      (St_ObstacleRight -> parklefttimer_St_ObstacleRight)
+      (St_LineSwitch -> parklefttimer_St_LineSwitch)
+      (St_Whiteline -> parklefttimer_St_Whiteline)
+      (St_WhitelineFollower -> parklefttimer_St_WhitelineFollower);
+  parkrighttimer =
+    merge ck
+      (St_Stopstate -> parkrighttimer_St_Stopstate)
+      (St_Parkright -> parkrighttimer_St_Parkright)
+      (St_Parkleft -> parkrighttimer_St_Parkleft)
+      (St_ParkingState -> parkrighttimer_St_ParkingState)
+      (St_BlackUturn -> parkrighttimer_St_BlackUturn)
+      (St_BlackRight -> parkrighttimer_St_BlackRight)
+      (St_Blackline -> parkrighttimer_St_Blackline)
+      (St_ObstacleFinalRight -> parkrighttimer_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> parkrighttimer_St_ObstacleLeft)
+      (St_ObstacleForward -> parkrighttimer_St_ObstacleForward)
+      (St_ObstacleRight -> parkrighttimer_St_ObstacleRight)
+      (St_LineSwitch -> parkrighttimer_St_LineSwitch)
+      (St_Whiteline -> parkrighttimer_St_Whiteline)
+      (St_WhitelineFollower -> parkrighttimer_St_WhitelineFollower);
+  parkdir =
+    merge ck
+      (St_Stopstate -> parkdir_St_Stopstate)
+      (St_Parkright -> parkdir_St_Parkright)
+      (St_Parkleft -> parkdir_St_Parkleft)
+      (St_ParkingState -> parkdir_St_ParkingState)
+      (St_BlackUturn -> parkdir_St_BlackUturn)
+      (St_BlackRight -> parkdir_St_BlackRight)
+      (St_Blackline -> parkdir_St_Blackline)
+      (St_ObstacleFinalRight -> parkdir_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> parkdir_St_ObstacleLeft)
+      (St_ObstacleForward -> parkdir_St_ObstacleForward)
+      (St_ObstacleRight -> parkdir_St_ObstacleRight)
+      (St_LineSwitch -> parkdir_St_LineSwitch)
+      (St_Whiteline -> parkdir_St_Whiteline)
+      (St_WhitelineFollower -> parkdir_St_WhitelineFollower);
+  parkingelapse =
+    merge ck
+      (St_Stopstate -> parkingelapse_St_Stopstate)
+      (St_Parkright -> parkingelapse_St_Parkright)
+      (St_Parkleft -> parkingelapse_St_Parkleft)
+      (St_ParkingState -> parkingelapse_St_ParkingState)
+      (St_BlackUturn -> parkingelapse_St_BlackUturn)
+      (St_BlackRight -> parkingelapse_St_BlackRight)
+      (St_Blackline -> parkingelapse_St_Blackline)
+      (St_ObstacleFinalRight -> parkingelapse_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> parkingelapse_St_ObstacleLeft)
+      (St_ObstacleForward -> parkingelapse_St_ObstacleForward)
+      (St_ObstacleRight -> parkingelapse_St_ObstacleRight)
+      (St_LineSwitch -> parkingelapse_St_LineSwitch)
+      (St_Whiteline -> parkingelapse_St_Whiteline)
+      (St_WhitelineFollower -> parkingelapse_St_WhitelineFollower);
+  checkparkhere =
+    merge ck
+      (St_Stopstate -> checkparkhere_St_Stopstate)
+      (St_Parkright -> checkparkhere_St_Parkright)
+      (St_Parkleft -> checkparkhere_St_Parkleft)
+      (St_ParkingState -> checkparkhere_St_ParkingState)
+      (St_BlackUturn -> checkparkhere_St_BlackUturn)
+      (St_BlackRight -> checkparkhere_St_BlackRight)
+      (St_Blackline -> checkparkhere_St_Blackline)
+      (St_ObstacleFinalRight -> checkparkhere_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> checkparkhere_St_ObstacleLeft)
+      (St_ObstacleForward -> checkparkhere_St_ObstacleForward)
+      (St_ObstacleRight -> checkparkhere_St_ObstacleRight)
+      (St_LineSwitch -> checkparkhere_St_LineSwitch)
+      (St_Whiteline -> checkparkhere_St_Whiteline)
+      (St_WhitelineFollower -> checkparkhere_St_WhitelineFollower);
+  navigation =
+    merge ck
+      (St_Stopstate -> navigation_St_Stopstate)
+      (St_Parkright -> navigation_St_Parkright)
+      (St_Parkleft -> navigation_St_Parkleft)
+      (St_ParkingState -> navigation_St_ParkingState)
+      (St_BlackUturn -> navigation_St_BlackUturn)
+      (St_BlackRight -> navigation_St_BlackRight)
+      (St_Blackline -> navigation_St_Blackline)
+      (St_ObstacleFinalRight -> navigation_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> navigation_St_ObstacleLeft)
+      (St_ObstacleForward -> navigation_St_ObstacleForward)
+      (St_ObstacleRight -> navigation_St_ObstacleRight)
+      (St_LineSwitch -> navigation_St_LineSwitch)
+      (St_Whiteline -> navigation_St_Whiteline)
+      (St_WhitelineFollower -> navigation_St_WhitelineFollower);
+  rightCounter =
+    merge ck
+      (St_Stopstate -> rightCounter_St_Stopstate)
+      (St_Parkright -> rightCounter_St_Parkright)
+      (St_Parkleft -> rightCounter_St_Parkleft)
+      (St_ParkingState -> rightCounter_St_ParkingState)
+      (St_BlackUturn -> rightCounter_St_BlackUturn)
+      (St_BlackRight -> rightCounter_St_BlackRight)
+      (St_Blackline -> rightCounter_St_Blackline)
+      (St_ObstacleFinalRight -> rightCounter_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> rightCounter_St_ObstacleLeft)
+      (St_ObstacleForward -> rightCounter_St_ObstacleForward)
+      (St_ObstacleRight -> rightCounter_St_ObstacleRight)
+      (St_LineSwitch -> rightCounter_St_LineSwitch)
+      (St_Whiteline -> rightCounter_St_Whiteline)
+      (St_WhitelineFollower -> rightCounter_St_WhitelineFollower);
+  finalavg0 =
+    merge ck
+      (St_Stopstate -> finalavg0_St_Stopstate)
+      (St_Parkright -> finalavg0_St_Parkright)
+      (St_Parkleft -> finalavg0_St_Parkleft)
+      (St_ParkingState -> finalavg0_St_ParkingState)
+      (St_BlackUturn -> finalavg0_St_BlackUturn)
+      (St_BlackRight -> finalavg0_St_BlackRight)
+      (St_Blackline -> finalavg0_St_Blackline)
+      (St_ObstacleFinalRight -> finalavg0_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> finalavg0_St_ObstacleLeft)
+      (St_ObstacleForward -> finalavg0_St_ObstacleForward)
+      (St_ObstacleRight -> finalavg0_St_ObstacleRight)
+      (St_LineSwitch -> finalavg0_St_LineSwitch)
+      (St_Whiteline -> finalavg0_St_Whiteline)
+      (St_WhitelineFollower -> finalavg0_St_WhitelineFollower);
+  finalavg1 =
+    merge ck
+      (St_Stopstate -> finalavg1_St_Stopstate)
+      (St_Parkright -> finalavg1_St_Parkright)
+      (St_Parkleft -> finalavg1_St_Parkleft)
+      (St_ParkingState -> finalavg1_St_ParkingState)
+      (St_BlackUturn -> finalavg1_St_BlackUturn)
+      (St_BlackRight -> finalavg1_St_BlackRight)
+      (St_Blackline -> finalavg1_St_Blackline)
+      (St_ObstacleFinalRight -> finalavg1_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> finalavg1_St_ObstacleLeft)
+      (St_ObstacleForward -> finalavg1_St_ObstacleForward)
+      (St_ObstacleRight -> finalavg1_St_ObstacleRight)
+      (St_LineSwitch -> finalavg1_St_LineSwitch)
+      (St_Whiteline -> finalavg1_St_Whiteline)
+      (St_WhitelineFollower -> finalavg1_St_WhitelineFollower);
+  finalavg2 =
+    merge ck
+      (St_Stopstate -> finalavg2_St_Stopstate)
+      (St_Parkright -> finalavg2_St_Parkright)
+      (St_Parkleft -> finalavg2_St_Parkleft)
+      (St_ParkingState -> finalavg2_St_ParkingState)
+      (St_BlackUturn -> finalavg2_St_BlackUturn)
+      (St_BlackRight -> finalavg2_St_BlackRight)
+      (St_Blackline -> finalavg2_St_Blackline)
+      (St_ObstacleFinalRight -> finalavg2_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> finalavg2_St_ObstacleLeft)
+      (St_ObstacleForward -> finalavg2_St_ObstacleForward)
+      (St_ObstacleRight -> finalavg2_St_ObstacleRight)
+      (St_LineSwitch -> finalavg2_St_LineSwitch)
+      (St_Whiteline -> finalavg2_St_Whiteline)
+      (St_WhitelineFollower -> finalavg2_St_WhitelineFollower);
+  finalavg3 =
+    merge ck
+      (St_Stopstate -> finalavg3_St_Stopstate)
+      (St_Parkright -> finalavg3_St_Parkright)
+      (St_Parkleft -> finalavg3_St_Parkleft)
+      (St_ParkingState -> finalavg3_St_ParkingState)
+      (St_BlackUturn -> finalavg3_St_BlackUturn)
+      (St_BlackRight -> finalavg3_St_BlackRight)
+      (St_Blackline -> finalavg3_St_Blackline)
+      (St_ObstacleFinalRight -> finalavg3_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> finalavg3_St_ObstacleLeft)
+      (St_ObstacleForward -> finalavg3_St_ObstacleForward)
+      (St_ObstacleRight -> finalavg3_St_ObstacleRight)
+      (St_LineSwitch -> finalavg3_St_LineSwitch)
+      (St_Whiteline -> finalavg3_St_Whiteline)
+      (St_WhitelineFollower -> finalavg3_St_WhitelineFollower);
+  finalavg4 =
+    merge ck
+      (St_Stopstate -> finalavg4_St_Stopstate)
+      (St_Parkright -> finalavg4_St_Parkright)
+      (St_Parkleft -> finalavg4_St_Parkleft)
+      (St_ParkingState -> finalavg4_St_ParkingState)
+      (St_BlackUturn -> finalavg4_St_BlackUturn)
+      (St_BlackRight -> finalavg4_St_BlackRight)
+      (St_Blackline -> finalavg4_St_Blackline)
+      (St_ObstacleFinalRight -> finalavg4_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> finalavg4_St_ObstacleLeft)
+      (St_ObstacleForward -> finalavg4_St_ObstacleForward)
+      (St_ObstacleRight -> finalavg4_St_ObstacleRight)
+      (St_LineSwitch -> finalavg4_St_LineSwitch)
+      (St_Whiteline -> finalavg4_St_Whiteline)
+      (St_WhitelineFollower -> finalavg4_St_WhitelineFollower);
+  whiteavgsen0 =
+    merge ck
+      (St_Stopstate -> whiteavgsen0_St_Stopstate)
+      (St_Parkright -> whiteavgsen0_St_Parkright)
+      (St_Parkleft -> whiteavgsen0_St_Parkleft)
+      (St_ParkingState -> whiteavgsen0_St_ParkingState)
+      (St_BlackUturn -> whiteavgsen0_St_BlackUturn)
+      (St_BlackRight -> whiteavgsen0_St_BlackRight)
+      (St_Blackline -> whiteavgsen0_St_Blackline)
+      (St_ObstacleFinalRight -> whiteavgsen0_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> whiteavgsen0_St_ObstacleLeft)
+      (St_ObstacleForward -> whiteavgsen0_St_ObstacleForward)
+      (St_ObstacleRight -> whiteavgsen0_St_ObstacleRight)
+      (St_LineSwitch -> whiteavgsen0_St_LineSwitch)
+      (St_Whiteline -> whiteavgsen0_St_Whiteline)
+      (St_WhitelineFollower -> whiteavgsen0_St_WhitelineFollower);
+  whiteavgsen1 =
+    merge ck
+      (St_Stopstate -> whiteavgsen1_St_Stopstate)
+      (St_Parkright -> whiteavgsen1_St_Parkright)
+      (St_Parkleft -> whiteavgsen1_St_Parkleft)
+      (St_ParkingState -> whiteavgsen1_St_ParkingState)
+      (St_BlackUturn -> whiteavgsen1_St_BlackUturn)
+      (St_BlackRight -> whiteavgsen1_St_BlackRight)
+      (St_Blackline -> whiteavgsen1_St_Blackline)
+      (St_ObstacleFinalRight -> whiteavgsen1_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> whiteavgsen1_St_ObstacleLeft)
+      (St_ObstacleForward -> whiteavgsen1_St_ObstacleForward)
+      (St_ObstacleRight -> whiteavgsen1_St_ObstacleRight)
+      (St_LineSwitch -> whiteavgsen1_St_LineSwitch)
+      (St_Whiteline -> whiteavgsen1_St_Whiteline)
+      (St_WhitelineFollower -> whiteavgsen1_St_WhitelineFollower);
+  whiteavgsen2 =
+    merge ck
+      (St_Stopstate -> whiteavgsen2_St_Stopstate)
+      (St_Parkright -> whiteavgsen2_St_Parkright)
+      (St_Parkleft -> whiteavgsen2_St_Parkleft)
+      (St_ParkingState -> whiteavgsen2_St_ParkingState)
+      (St_BlackUturn -> whiteavgsen2_St_BlackUturn)
+      (St_BlackRight -> whiteavgsen2_St_BlackRight)
+      (St_Blackline -> whiteavgsen2_St_Blackline)
+      (St_ObstacleFinalRight -> whiteavgsen2_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> whiteavgsen2_St_ObstacleLeft)
+      (St_ObstacleForward -> whiteavgsen2_St_ObstacleForward)
+      (St_ObstacleRight -> whiteavgsen2_St_ObstacleRight)
+      (St_LineSwitch -> whiteavgsen2_St_LineSwitch)
+      (St_Whiteline -> whiteavgsen2_St_Whiteline)
+      (St_WhitelineFollower -> whiteavgsen2_St_WhitelineFollower);
+  whiteavgsen3 =
+    merge ck
+      (St_Stopstate -> whiteavgsen3_St_Stopstate)
+      (St_Parkright -> whiteavgsen3_St_Parkright)
+      (St_Parkleft -> whiteavgsen3_St_Parkleft)
+      (St_ParkingState -> whiteavgsen3_St_ParkingState)
+      (St_BlackUturn -> whiteavgsen3_St_BlackUturn)
+      (St_BlackRight -> whiteavgsen3_St_BlackRight)
+      (St_Blackline -> whiteavgsen3_St_Blackline)
+      (St_ObstacleFinalRight -> whiteavgsen3_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> whiteavgsen3_St_ObstacleLeft)
+      (St_ObstacleForward -> whiteavgsen3_St_ObstacleForward)
+      (St_ObstacleRight -> whiteavgsen3_St_ObstacleRight)
+      (St_LineSwitch -> whiteavgsen3_St_LineSwitch)
+      (St_Whiteline -> whiteavgsen3_St_Whiteline)
+      (St_WhitelineFollower -> whiteavgsen3_St_WhitelineFollower);
+  whiteavgsen4 =
+    merge ck
+      (St_Stopstate -> whiteavgsen4_St_Stopstate)
+      (St_Parkright -> whiteavgsen4_St_Parkright)
+      (St_Parkleft -> whiteavgsen4_St_Parkleft)
+      (St_ParkingState -> whiteavgsen4_St_ParkingState)
+      (St_BlackUturn -> whiteavgsen4_St_BlackUturn)
+      (St_BlackRight -> whiteavgsen4_St_BlackRight)
+      (St_Blackline -> whiteavgsen4_St_Blackline)
+      (St_ObstacleFinalRight -> whiteavgsen4_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> whiteavgsen4_St_ObstacleLeft)
+      (St_ObstacleForward -> whiteavgsen4_St_ObstacleForward)
+      (St_ObstacleRight -> whiteavgsen4_St_ObstacleRight)
+      (St_LineSwitch -> whiteavgsen4_St_LineSwitch)
+      (St_Whiteline -> whiteavgsen4_St_Whiteline)
+      (St_WhitelineFollower -> whiteavgsen4_St_WhitelineFollower);
+  lastcountwhite =
+    merge ck
+      (St_Stopstate -> lastcountwhite_St_Stopstate)
+      (St_Parkright -> lastcountwhite_St_Parkright)
+      (St_Parkleft -> lastcountwhite_St_Parkleft)
+      (St_ParkingState -> lastcountwhite_St_ParkingState)
+      (St_BlackUturn -> lastcountwhite_St_BlackUturn)
+      (St_BlackRight -> lastcountwhite_St_BlackRight)
+      (St_Blackline -> lastcountwhite_St_Blackline)
+      (St_ObstacleFinalRight -> lastcountwhite_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> lastcountwhite_St_ObstacleLeft)
+      (St_ObstacleForward -> lastcountwhite_St_ObstacleForward)
+      (St_ObstacleRight -> lastcountwhite_St_ObstacleRight)
+      (St_LineSwitch -> lastcountwhite_St_LineSwitch)
+      (St_Whiteline -> lastcountwhite_St_Whiteline)
+      (St_WhitelineFollower -> lastcountwhite_St_WhitelineFollower);
+  ns =
+    merge ck
+      (St_Stopstate -> ns_St_Stopstate)(St_Parkright -> ns_St_Parkright)
+      (St_Parkleft -> ns_St_Parkleft)(St_ParkingState -> ns_St_ParkingState)
+      (St_BlackUturn -> ns_St_BlackUturn)(St_BlackRight -> ns_St_BlackRight)
+      (St_Blackline -> ns_St_Blackline)
+      (St_ObstacleFinalRight -> ns_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> ns_St_ObstacleLeft)
+      (St_ObstacleForward -> ns_St_ObstacleForward)
+      (St_ObstacleRight -> ns_St_ObstacleRight)
+      (St_LineSwitch -> ns_St_LineSwitch)(St_Whiteline -> ns_St_Whiteline)
+      (St_WhitelineFollower -> ns_St_WhitelineFollower);
+  nr =
+    merge ck
+      (St_Stopstate -> nr_St_Stopstate)(St_Parkright -> nr_St_Parkright)
+      (St_Parkleft -> nr_St_Parkleft)(St_ParkingState -> nr_St_ParkingState)
+      (St_BlackUturn -> nr_St_BlackUturn)(St_BlackRight -> nr_St_BlackRight)
+      (St_Blackline -> nr_St_Blackline)
+      (St_ObstacleFinalRight -> nr_St_ObstacleFinalRight)
+      (St_ObstacleLeft -> nr_St_ObstacleLeft)
+      (St_ObstacleForward -> nr_St_ObstacleForward)
+      (St_ObstacleRight -> nr_St_ObstacleRight)
+      (St_LineSwitch -> nr_St_LineSwitch)(St_Whiteline -> nr_St_Whiteline)
+      (St_WhitelineFollower -> nr_St_WhitelineFollower)
+tel
+
+node main(sen0 : int; sen1 : int; sen2 : int; sen3 : int; sen4 : int;
+           irsenLeft : bool; irsenFront : bool; irsenRight : bool)
+returns (v_l : int; v_r : int; direction : int)
+var sen : int^5;
+let
+  (v_l, v_r, direction) =
+    line_follower(sen, irsenLeft, irsenFront, irsenRight);
+  sen = [sen0; sen1; sen2; sen3; sen4]
+tel
+

@@ -1,0 +1,381 @@
+
+node line_follower(sen: int^5;irsenLeft, irsenFront, irsenRight : bool) returns (v_l, v_r, direction: int)
+var last rightTurn: bool = false;
+    last uTurn: bool = false;
+    last error: int = 0;               -- Error calculation
+    last p :int = 0;
+    last i : int = 0;
+    last d : int = 0;                      -- PID terms
+    last pid_value: int = 0;
+    last number : int = 20;
+    last dir: int = 0;                    -- Final PID output
+    last act0 : int = 0;
+    last act1 : int = 0;
+    last act2 : int = 0;
+    last act3 : int = 0;
+    last act4 : int = 0;
+	last sum : int = 0;
+    last left : int = 0;
+    last right : int = 0;
+    last objectCounter: int = 0;
+    last objectLeftCounter: int = 0;
+    last stopCounter: int = 0;
+    last parklefttimer: int = 1;
+    last parkrighttimer: int = 1;
+    last parkdir: int;
+    last parkingelapse: int;
+    last checkparkhere: int;
+    last navigation: int;
+    last rightCounter: int = 0;
+    last finalavg0: int = 0;
+    last finalavg1: int = 0;
+    last finalavg2: int = 0;
+    last finalavg3: int = 0;
+    last finalavg4: int = 0;
+    last whiteavgsen0: int = 0;
+    last whiteavgsen1: int = 0;
+    last whiteavgsen2: int = 0;
+    last whiteavgsen3: int = 0;
+    last whiteavgsen4: int = 0;
+    last lastcountwhite: int = 0;
+let 
+    automaton
+
+    state WhitelineFollower
+    do
+    
+    lastcountwhite = (last lastcountwhite)+1;
+        whiteavgsen0 = if lastcountwhite<3000 then (last whiteavgsen0)+sen[0] else if lastcountwhite=3000 then ((last whiteavgsen0)/3000) else (last whiteavgsen0);
+        whiteavgsen1 = if lastcountwhite<3000 then (last whiteavgsen1)+sen[1] else if lastcountwhite=3000 then ((last whiteavgsen1)/3000) else (last whiteavgsen1);
+        whiteavgsen2 = if lastcountwhite<3000 then (last whiteavgsen2)+sen[2] else if lastcountwhite=3000 then ((last whiteavgsen2)/3000) else (last whiteavgsen2);
+        whiteavgsen3 = if lastcountwhite<3000 then (last whiteavgsen3)+sen[3] else if lastcountwhite=3000 then ((last whiteavgsen3)/3000) else (last whiteavgsen3);
+        whiteavgsen4 = if lastcountwhite<3000 then (last whiteavgsen4)+sen[4] else if lastcountwhite=3000 then ((last whiteavgsen4)/3000) else (last whiteavgsen4);
+
+
+        v_l = 35;
+        v_r = 35;
+        direction = if lastcountwhite<3000 then 2 else 100;
+
+        finalavg0 = if lastcountwhite>3000 then (last whiteavgsen0)-150 else 0;
+        finalavg1 = if lastcountwhite>3000 then (last whiteavgsen1)-150 else 0;
+        finalavg2 = if lastcountwhite>3000 then (last whiteavgsen2)-150 else 0;
+        finalavg3 = if lastcountwhite>3000 then (last whiteavgsen3)-150 else 0;
+        finalavg4 = if lastcountwhite>3000 then (last whiteavgsen4)-150 else 0;
+
+    until lastcountwhite = 5000 then Whiteline
+
+    state Whiteline
+    do
+    
+    act0 = if sen[0] <= last finalavg0 then 0 else 1;
+    act1 = if sen[1] <= last finalavg1 then 0 else 1;
+    act2 = if sen[2] <= last finalavg2 then 0 else 1;
+    act3 = if sen[3] <= last finalavg3 then 0 else 1;
+    act4 = if sen[4] <= last finalavg4 then 0 else 1;
+
+	sum = sen[0]+sen[1]+sen[2]+sen[3]+sen[4];
+
+    number = act0 + act1 + act2 + act3 + act4;
+
+    error = (-10*act0 + -5*act1 + 0*act2 + 5*act3 + 10*act4);
+
+	p = error;
+    i = (last i)+error;
+    d = (error - (last error));
+    pid_value = 3*p + i/1000 + d;
+
+	
+	left =  if error < -5 then 50
+            else if error > 5 then 50
+            else 50+pid_value;
+	right = if error < -5 then 50
+            else if error > 5 then 50
+            else 50-pid_value;
+
+	v_l = if left < 0 then 0 else left;
+	v_r = if right < 0 then 0 else right;
+
+    dir =   if error < -5 then 1
+            else if error > 5 then 2
+            else 0;
+
+    direction = dir;
+    until (act0=1 and act1=0 and act2=1 and act3=1 and act4=1)
+                            or (act0=1 and act1=1 and act2=0 and act3=1 and act4=1) 
+                            or (act0=1 and act1=1 and act2=1 and act3=0 and act4=1) then LineSwitch
+
+    state LineSwitch
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+
+	sum = sen[0]+sen[1]+sen[2]+sen[3]+sen[4];
+
+    number = act0 + act1 + act2 + act3 + act4;
+
+    error = (-4*act0 + -3*act1 + 0*act2 + 3*act3 + 4*act4);
+
+	p = error;
+    i = (last i)+error;
+    d = (error - (last error));
+    pid_value = 2*p + i/1000 + d;
+
+	
+	left =  30+pid_value;
+	right = 30-pid_value;
+
+	
+	dir = 0;
+
+    v_l = if left < 0 then 0 else left;
+	v_r = if right < 0 then 0 else right;
+    
+    direction = dir;
+    
+    rightCounter = if act1 = 1 and act2 = 1 and act3 = 1 then (last rightCounter)+1
+                else 0;
+    rightTurn = if rightCounter>50 then true
+                else false;
+    until rightTurn then BlackRight
+
+
+--Code for Obstacle detection ********************************************************************************************
+    state ObstacleRight
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+
+        
+        v_l = 30;
+	    v_r = 30;
+        direction = 2;
+    until not irsenLeft then ObstacleForward
+
+    state ObstacleForward
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+
+
+        number = act0 + act1 + act2 + act3 + act4;
+
+        v_l = 40;
+        v_r = 30;
+        direction = 0;
+    until (number = 1 and act4 = 1) then ObstacleFinalRight | irsenLeft then ObstacleLeft
+
+    state ObstacleLeft
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+        objectLeftCounter = if not irsenFront then (last objectLeftCounter)+1 else 0;
+        v_l = if not irsenFront then 30 else 20;
+        v_r = if not irsenFront then 30 else 40;
+        direction = if not irsenFront then 0 else 1;
+
+        number = act0 + act1 + act2 + act3 + act4;
+    until (number >= 1) then ObstacleFinalRight | not irsenLeft then ObstacleForward | objectLeftCounter>20 then ObstacleRight 
+
+    state ObstacleFinalRight
+    do
+
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+        v_l = 40;
+        v_r = 0;
+        direction = 0;
+        number = act0 + act1 + act2 + act3 + act4;
+
+    until (act0 = 1 or act4 = 1) then Blackline
+
+
+--Code for Blackline detection ********************************************************************************************
+    state Blackline
+    var count: int;
+    
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+
+	sum = sen[0]+sen[1]+sen[2]+sen[3]+sen[4];
+
+    number = act0 + act1 + act2 + act3 + act4;
+
+    error = (-4*act0 + -3*act1 + 0*act2 + 3*act3 + 4*act4);
+
+	p = error;
+    i = (last i)+error;
+    d = (error - (last error));
+    pid_value = 3*p + i/1000 + d;
+
+	
+	left =  40+pid_value;
+	right = 40-pid_value;
+
+	
+	dir = 0;
+
+    v_l = if left < 0 then 0 else left;
+	v_r = if right < 0 then 0 else right;
+    
+    direction = dir;
+    
+    rightCounter = if act1 = 1 and act2 = 1 and act3 = 1 then (last rightCounter)+1
+                else 0;
+    rightTurn = if rightCounter>10 then true
+                else false;
+
+    stopCounter = if rightTurn then (last stopCounter)+1
+                else (last stopCounter);
+    
+    count = 0->if act0 = 0 and act1 = 0 and act2 = 0 and act3 = 0 and act4 = 0 then pre(count)+1 else 0;
+    
+    uTurn = if count > 100 then true else false;
+
+    objectCounter = if not irsenFront then (last objectCounter)+1 else 0
+
+    until stopCounter = 9 then ParkingState | objectCounter>100 then ObstacleRight | rightTurn then BlackRight | uTurn then BlackUturn
+
+
+    state BlackRight
+    var count: int;
+    do
+
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+        v_l = 50;
+        v_r = 0;
+        direction = 0;
+        number = act0 + act1 + act2 + act3 + act4;
+        count = 0->if act0 = 0 and act1 = 0 and act2 = 0 and act3 = 0 and act4 = 0 then pre(count)+1 else 0;
+    
+        uTurn = if count >200 then true else false;
+
+    until (number = 1 and act2 = 1) then Blackline | uTurn then BlackUturn
+
+
+    state BlackUturn
+    
+    do
+
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+        v_l = 40;
+        v_r = 40;
+        direction = 1;
+        number = act0 + act1 + act2 + act3 + act4; 
+    
+    until act2 = 1 then Blackline
+    
+
+--ParkingState*******************************************************************
+    state ParkingState
+    do
+        act0 = if sen[0] <= (last finalavg0) then 1 else 0;
+        act1 = if sen[1] <= (last finalavg1) then 1 else 0;
+        act2 = if sen[2] <= (last finalavg2) then 1 else 0;
+        act3 = if sen[3] <= (last finalavg3) then 1 else 0;
+        act4 = if sen[4] <= (last finalavg4) then 1 else 0;
+ 
+    sum = sen[0]+sen[1]+sen[2]+sen[3]+sen[4];
+ 
+        number = act0 + act1 + act2 + act3 + act4;
+ 
+        error = (-4*act0 + -3*act1 + 0*act2 + 3*act3 + 4*act4);
+ 
+    p = error;
+        i = (last i)+error;
+        d = (error - (last error));
+        pid_value = 3*p + i/1000 + d;
+ 
+ 
+    left =  40+pid_value;
+    right = 40-pid_value;
+ 
+ 
+        dir = 0;
+ 
+        
+        parkingelapse = 1 -> pre(parkingelapse)+1;
+ 
+        navigation = if parkingelapse < 800 then 0 
+                    else if parkingelapse < 1200 then 4 
+                    else if parkingelapse < 2300 then 0 
+                    else if parkingelapse < 2700 then 4 
+                    else if parkingelapse < 3400 then 0 
+                    else if parkingelapse < 3700 then 4 else 0;
+ 
+        checkparkhere = if (parkingelapse > 900 and parkingelapse < 950) then 1 
+                    else if (parkingelapse > 2500 and parkingelapse < 2550) then 1 
+                    else if (parkingelapse > 3500) then 1 else 0;
+ 
+        parkdir = if checkparkhere = 1 then 
+                    (if (irsenLeft = false and irsenRight = false) then 0 
+                     else if (irsenLeft = false and irsenRight = true) then 2 
+                     else if (irsenLeft = true and irsenRight = false) then 1 
+                     else if (irsenLeft = true and irsenRight = true) then 1 else 0) 
+                  else 0;
+ 
+        direction = dir;
+        v_l = if navigation = 4 then 0 else if left < 0 then 0 else left;
+        v_r = if navigation = 4 then 0 else if right < 0 then 0 else right;
+    until parkdir = 1 then Parkleft | parkdir = 2 then Parkright
+ 
+    state Parkleft 
+    do 
+        parklefttimer = 1 -> if pre(parklefttimer) = 1801 then 1 else pre(parklefttimer)+1;
+        v_l = if parklefttimer < 500 then 40 else if parklefttimer < 1700 then 25 else 40;
+        v_r = if parklefttimer < 500 then 40 else if parklefttimer < 1700 then 45 else 40;
+        direction = if parklefttimer < 500 then 0 else 3;
+ 
+    until parklefttimer = 1800 then Stopstate
+ 
+    state Parkright 
+    do 
+        parkrighttimer = 1 -> if pre(parkrighttimer) = 1801 then 2 else pre(parkrighttimer)+1;
+        v_l = if parkrighttimer < 500 then 40 else if parkrighttimer < 1700 then 45 else 40;
+        v_r = if parkrighttimer < 500 then 40 else if parkrighttimer < 1700 then 25 else 40;
+        direction = if parkrighttimer < 500 then 0 else 3;
+ 
+    until parkrighttimer = 1800 then Stopstate
+ 
+    state Stopstate
+    do
+      v_l = 0;
+      v_r = 0;
+      direction  = 100;
+    until true then Stopstate
+    end
+tel
+
+node main(sen0, sen1, sen2, sen3, sen4: int; irsenLeft, irsenFront, irsenRight : bool) returns (v_l, v_r, direction: int)
+var sen: int^5;
+
+let
+	 sen = [sen0, sen1, sen2, sen3, sen4];
+     (v_l, v_r, direction) = line_follower(sen,irsenLeft, irsenFront, irsenRight);
+tel
