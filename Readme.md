@@ -127,10 +127,3 @@ This project implements a sophisticated line-following robot using a state machi
    - Black line threshold = white_average - 150
    - Binary conversion: sensor ≤ threshold → line detected
 
-## Performance Characteristics
-
-- **Line Following Accuracy**: ±2cm typical deviation
-- **Obstacle Avoidance**: Right-hand wall following
-- **Parking Success Rate**: High reliability with proper sensor placement
-- **Recovery Time**: <2 seconds for U-turn recovery
-- **Speed Range**: 0-50+ speed units (adjustable)
